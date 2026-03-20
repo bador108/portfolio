@@ -3,6 +3,20 @@
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+
+
+	onMount(async () => {
+		const gsap = (await import("gsap")).default;
+		const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
+
+		gsap.registerPlugin(ScrollTrigger);
+
+		gsap.to(".box", {
+			scrollTrigger: ".box",
+			x: 300
+		});
+	});
+
   gsap.registerPlugin(ScrollTrigger);
 
   // ── DARK MODE
@@ -151,21 +165,7 @@
 </script>
 
 
-<script>
-	import { onMount } from "svelte";
 
-	onMount(async () => {
-		const gsap = (await import("gsap")).default;
-		const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
-
-		gsap.registerPlugin(ScrollTrigger);
-
-		gsap.to(".box", {
-			scrollTrigger: ".box",
-			x: 300
-		});
-	});
-</script>
 
 <div class="scroll-prog"></div>
 
