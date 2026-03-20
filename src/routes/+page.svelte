@@ -150,6 +150,23 @@
   });
 </script>
 
+
+<script>
+	import { onMount } from "svelte";
+
+	onMount(async () => {
+		const gsap = (await import("gsap")).default;
+		const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
+
+		gsap.registerPlugin(ScrollTrigger);
+
+		gsap.to(".box", {
+			scrollTrigger: ".box",
+			x: 300
+		});
+	});
+</script>
+
 <div class="scroll-prog"></div>
 
 <!-- ══ NAV ══ -->
