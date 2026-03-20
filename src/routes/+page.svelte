@@ -98,54 +98,53 @@
     });
 
     // Reveal
-    gsap.utils.toArray('.ap-reveal').forEach(el => {
-      gsap.from(el, {
-        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
-        y: 48, opacity: 0, duration: 1, ease: 'power3.out',
-      });
-    });
-
-    gsap.utils.toArray('.ap-stagger').forEach(parent => {
-      gsap.from(parent.querySelectorAll('.ap-si'), {
-        scrollTrigger: { trigger: parent, start: 'top 85%', toggleActions: 'play none none none' },
-        y: 40, opacity: 0, duration: .8, stagger: .1, ease: 'power3.out',
-      });
-    });
-
-    // Skill bars
-    gsap.utils.toArray('.skill-fill').forEach(el => {
-      gsap.fromTo(el, { width: '0%' }, {
-        width: el.dataset.w,
-        scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play none none none' },
-        duration: 1.4, ease: 'power3.out',
-      });
-    });
-
-    // Project parallax
-    gsap.utils.toArray('.proj-visual').forEach(el => {
-      gsap.to(el, {
-        y: -40,
-        scrollTrigger: { trigger: el.closest('.proj-row'), scrub: 1.5, start: 'top bottom', end: 'bottom top' },
-      });
-    });
-
-    // Quote split
-    gsap.utils.toArray('.split-reveal').forEach(el => {
-      gsap.from(el, {
-        scrollTrigger: { trigger: el, start: 'top 80%', toggleActions: 'play none none none' },
-        y: '100%', opacity: 0, duration: 1.1, ease: 'power4.out',
-      });
-    });
-
-    // Marquee
-    gsap.to('.mq-track', { x: '-50%', duration: 28, repeat: -1, ease: 'none' });
-
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      ScrollTrigger.getAll().forEach(t => t.kill());
-    };
+// Reveal
+gsap.utils.toArray('.ap-reveal').forEach(el => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play reverse play reverse' },
+    y: 48, opacity: 0, duration: 1, ease: 'power3.out',
   });
-</script>
+});
+
+gsap.utils.toArray('.ap-stagger').forEach(parent => {
+  gsap.from(parent.querySelectorAll('.ap-si'), {
+    scrollTrigger: { trigger: parent, start: 'top 85%', toggleActions: 'play reverse play reverse' },
+    y: 40, opacity: 0, duration: .8, stagger: .1, ease: 'power3.out',
+  });
+});
+
+// Skill bars
+gsap.utils.toArray('.skill-fill').forEach(el => {
+  gsap.fromTo(el, { width: '0%' }, {
+    width: el.dataset.w,
+    scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play reverse play reverse' },
+    duration: 1.4, ease: 'power3.out',
+  });
+});
+
+// Project parallax
+gsap.utils.toArray('.proj-visual').forEach(el => {
+  gsap.to(el, {
+    y: -40,
+    scrollTrigger: { trigger: el.closest('.proj-row'), scrub: 1.5, start: 'top bottom', end: 'bottom top' },
+  });
+});
+
+// Quote split
+gsap.utils.toArray('.split-reveal').forEach(el => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 80%', toggleActions: 'play reverse play reverse' },
+    y: '100%', opacity: 0, duration: 1.1, ease: 'power4.out',
+  });
+});
+
+// Marquee
+gsap.to('.mq-track', { x: '-50%', duration: 28, repeat: -1, ease: 'none' });
+
+return () => {
+  window.removeEventListener('scroll', onScroll);
+  ScrollTrigger.getAll().forEach(t => t.kill());
+};
 
 
 
