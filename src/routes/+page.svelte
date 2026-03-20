@@ -146,6 +146,8 @@ return () => {
   ScrollTrigger.getAll().forEach(t => t.kill());
 };
 
+</script>
+
 
 
 
