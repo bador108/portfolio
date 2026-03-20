@@ -1,15 +1,14 @@
 <script>
   import { onMount } from 'svelte';
-
-  // ── DARK MODE
+ 
   let dark = $state(false);
-
+ 
   function toggleDark() {
     dark = !dark;
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
     localStorage.setItem('theme', dark ? 'dark' : 'light');
   }
-
+ 
   const projects = [
     { num: '01', title: 'Star Wars Archive', sub: 'Interaktivní 3D archiv',
       desc: 'Clone Wars vesmír v prohlížeči. Galaktická mapa, velitelé, laboratoř světelného meče — vše animované a interaktivní.',
@@ -32,7 +31,7 @@
       url: 'https://clone-wars-psi.vercel.app/',
     },
   ];
-
+ 
   const skills = [
     { name: 'HTML & CSS',       pct: 92 },
     { name: 'JavaScript',       pct: 82 },
@@ -43,10 +42,10 @@
     { name: 'Správa sítí',      pct: 85 },
     { name: 'Linux / Windows',  pct: 80 },
   ];
-
+ 
   let navScrolled = $state(false);
   let formName = $state(''), formEmail = $state(''), formMsg = $state(''), formStatus = $state('');
-
+ 
   async function handleSubmit(e) {
     e.preventDefault();
     formStatus = 'sending';
@@ -59,24 +58,20 @@
       formStatus = res.ok ? 'success' : 'error';
     } catch { formStatus = 'error'; }
   }
-
+ 
   onMount(async () => {
-    // Load GSAP safely on client
-    const gsap = (await import("gsap")).default;
-    const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
+    const gsap = (await import('gsap')).default;
+    const ScrollTrigger = (await import('gsap/ScrollTrigger')).default;
     gsap.registerPlugin(ScrollTrigger);
-
-    // Load saved theme
+ 
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     dark = saved ? saved === 'dark' : prefersDark;
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-
-    // Nav scroll
+ 
     const onScroll = () => { navScrolled = window.scrollY > 40; };
     window.addEventListener('scroll', onScroll);
-
-    // Hero animation
+ 
     gsap.timeline({ delay: 0.2 })
       .from('.hero-eyebrow', { y: 20, opacity: 0, duration: .8, ease: 'power3.out' })
       .from('.hero-line span', { y: '100%', opacity: 0, duration: 1, stagger: .1, ease: 'power4.out' }, '-=.4')
@@ -84,69 +79,62 @@
       .from('.hero-btns a',  { y: 16, opacity: 0, duration: .6, stagger: .1, ease: 'power3.out' }, '-=.4')
       .from('.hero-scroll',  { opacity: 0, duration: 1 }, '-=.2')
       .from('.hm-item',      { y: 10, opacity: 0, duration: .5, stagger: .08 }, '-=.6');
-
-    // Scroll progress
+ 
     gsap.to('.scroll-prog', {
       scaleX: 1, ease: 'none',
       scrollTrigger: { scrub: .3, start: 'top top', end: 'bottom bottom' },
     });
-
-    // Hero parallax
+ 
     gsap.to('.hero-bg-word', {
       y: 200, opacity: 0,
       scrollTrigger: { scrub: 2, start: 'top top', end: 'bottom top' },
     });
-
-    // Reveal
-// Reveal
-gsap.utils.toArray('.ap-reveal').forEach(el => {
-  gsap.from(el, {
-    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play reverse play reverse' },
-    y: 48, opacity: 0, duration: 1, ease: 'power3.out',
+ 
+    gsap.utils.toArray('.ap-reveal').forEach(el => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play reverse play reverse' },
+        y: 48, opacity: 0, duration: 1, ease: 'power3.out',
+      });
+    });
+ 
+    gsap.utils.toArray('.ap-stagger').forEach(parent => {
+      gsap.from(parent.querySelectorAll('.ap-si'), {
+        scrollTrigger: { trigger: parent, start: 'top 85%', toggleActions: 'play reverse play reverse' },
+        y: 40, opacity: 0, duration: .8, stagger: .1, ease: 'power3.out',
+      });
+    });
+ 
+    gsap.utils.toArray('.skill-fill').forEach(el => {
+      gsap.fromTo(el, { width: '0%' }, {
+        width: el.dataset.w,
+        scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play reverse play reverse' },
+        duration: 1.4, ease: 'power3.out',
+      });
+    });
+ 
+    gsap.utils.toArray('.proj-visual').forEach(el => {
+      gsap.to(el, {
+        y: -40,
+        scrollTrigger: { trigger: el.closest('.proj-row'), scrub: 1.5, start: 'top bottom', end: 'bottom top' },
+      });
+    });
+ 
+    gsap.utils.toArray('.split-reveal').forEach(el => {
+      gsap.from(el, {
+        scrollTrigger: { trigger: el, start: 'top 80%', toggleActions: 'play reverse play reverse' },
+        y: '100%', opacity: 0, duration: 1.1, ease: 'power4.out',
+      });
+    });
+ 
+    gsap.to('.mq-track', { x: '-50%', duration: 28, repeat: -1, ease: 'none' });
+ 
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
   });
-});
-
-gsap.utils.toArray('.ap-stagger').forEach(parent => {
-  gsap.from(parent.querySelectorAll('.ap-si'), {
-    scrollTrigger: { trigger: parent, start: 'top 85%', toggleActions: 'play reverse play reverse' },
-    y: 40, opacity: 0, duration: .8, stagger: .1, ease: 'power3.out',
-  });
-});
-
-// Skill bars
-gsap.utils.toArray('.skill-fill').forEach(el => {
-  gsap.fromTo(el, { width: '0%' }, {
-    width: el.dataset.w,
-    scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play reverse play reverse' },
-    duration: 1.4, ease: 'power3.out',
-  });
-});
-
-// Project parallax
-gsap.utils.toArray('.proj-visual').forEach(el => {
-  gsap.to(el, {
-    y: -40,
-    scrollTrigger: { trigger: el.closest('.proj-row'), scrub: 1.5, start: 'top bottom', end: 'bottom top' },
-  });
-});
-
-// Quote split
-gsap.utils.toArray('.split-reveal').forEach(el => {
-  gsap.from(el, {
-    scrollTrigger: { trigger: el, start: 'top 80%', toggleActions: 'play reverse play reverse' },
-    y: '100%', opacity: 0, duration: 1.1, ease: 'power4.out',
-  });
-});
-
-// Marquee
-gsap.to('.mq-track', { x: '-50%', duration: 28, repeat: -1, ease: 'none' });
-
-return () => {
-  window.removeEventListener('scroll', onScroll);
-  ScrollTrigger.getAll().forEach(t => t.kill());
-};
-
 </script>
+ 
 
 
 
