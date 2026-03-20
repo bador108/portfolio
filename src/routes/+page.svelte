@@ -1,23 +1,5 @@
 <script>
   import { onMount } from 'svelte';
-  import { gsap } from 'gsap';
-
-
-
-
-	onMount(async () => {
-		const gsap = (await import("gsap")).default;
-		const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
-
-		gsap.registerPlugin(ScrollTrigger);
-
-		gsap.to(".box", {
-			scrollTrigger: ".box",
-			x: 300
-		});
-	});
-
-  gsap.registerPlugin(ScrollTrigger);
 
   // ── DARK MODE
   let dark = $state(false);
@@ -29,26 +11,22 @@
   }
 
   const projects = [
-    {
-      num: '01', title: 'Star Wars Archive', sub: 'Interaktivní 3D archiv',
+    { num: '01', title: 'Star Wars Archive', sub: 'Interaktivní 3D archiv',
       desc: 'Clone Wars vesmír v prohlížeči. Galaktická mapa, velitelé, laboratoř světelného meče — vše animované a interaktivní.',
       tech: ['Next.js', 'React', 'Canvas API'], color: '#0071e3',
       url: 'https://clone-wars-psi.vercel.app/star-wars',
     },
-    {
-      num: '02', title: 'F1 2026 Tracker', sub: 'Živá data & 3D vozy',
+    { num: '02', title: 'F1 2026 Tracker', sub: 'Živá data & 3D vozy',
       desc: 'Přehled sezóny 2026 v reálném čase. Three.js 3D modely vozů, tabulky jezdců, týmů a kalendář závodů.',
       tech: ['Next.js', 'Three.js', 'GSAP'], color: '#ff3b30',
       url: 'https://clone-wars-psi.vercel.app/f1',
     },
-    {
-      num: '03', title: 'CV Builder', sub: 'Interaktivní tvůrce CV',
+    { num: '03', title: 'CV Builder', sub: 'Interaktivní tvůrce CV',
       desc: '3 šablony, 6 barev, live preview a export do PDF. Vytvoř profesionální CV za pár minut.',
       tech: ['SvelteKit', 'Svelte 5', 'CSS'], color: '#34c759',
       url: '/cv',
     },
-    {
-      num: '04', title: 'Projekt Hub', sub: 'Centrální rozcestník',
+    { num: '04', title: 'Projekt Hub', sub: 'Centrální rozcestník',
       desc: 'Rozcestník pro všechny projekty s animovaným hvězdným pozadím a interaktivními kartami.',
       tech: ['Next.js', 'React', 'Canvas API'], color: '#5e5ce6',
       url: 'https://clone-wars-psi.vercel.app/',
@@ -82,7 +60,12 @@
     } catch { formStatus = 'error'; }
   }
 
-  onMount(() => {
+  onMount(async () => {
+    // Load GSAP safely on client
+    const gsap = (await import("gsap")).default;
+    const ScrollTrigger = (await import("gsap/ScrollTrigger")).default;
+    gsap.registerPlugin(ScrollTrigger);
+
     // Load saved theme
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
