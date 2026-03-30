@@ -507,9 +507,10 @@
 
 <style>
   :global(*, *::before, *::after) { margin:0; padding:0; box-sizing:border-box; }
-  :global(html,body) { height:100%; background:#0f0f0f; font-family:'Inter',sans-serif; overflow:hidden; }
+  :global(html) { overflow:hidden; height:100%; background:#0f0f0f; }
+  :global(body) { overflow:hidden; height:100%; font-family:'Inter',sans-serif; background:#0f0f0f; }
 
-  .builder { display:grid; grid-template-columns:460px 1fr; height:100vh; overflow:hidden; }
+  .builder { display:grid; grid-template-columns:460px 1fr; height:100vh; max-width:100vw; overflow:hidden; }
 
   /* ── PANEL ── */
   .panel { background:#141414; border-right:1px solid rgba(255,255,255,.07); overflow-y:auto; overflow-x:hidden; display:flex; flex-direction:column; }
