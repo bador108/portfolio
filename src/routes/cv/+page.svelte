@@ -17,33 +17,11 @@
   ];
 
   let cv = $state({
-    firstName: 'Jan',
-    lastName: 'Novák',
-    role: 'Frontend Developer',
-    email: 'jan.novak@email.cz',
-    phone: '605 123 456',
-    location: 'Praha',
-    website: '',
-    github: 'github.com/jannovak',
-    summary: 'Frontend developer s vášní pro čistý kód a skvělé uživatelské zážitky. Specializuji se na moderní JavaScript frameworky a rád pracuji na projektech, které mají smysl.',
-    experience: [
-      { company: 'Startup s.r.o.', role: 'Frontend Developer', from: '2023', to: 'současnost', desc: 'Vývoj uživatelského rozhraní v Reactu a TypeScriptu. Optimalizace výkonu, code review, spolupráce s designery.' },
-      { company: 'Webová agentura XY', role: 'Junior Developer', from: '2021', to: '2023', desc: 'Tvorba webových stránek a e-shopů — HTML, CSS, JavaScript, WordPress.' },
-    ],
-    education: [
-      { school: 'ČVUT Praha', field: 'Softwarové inženýrství', from: '2020', to: '2024', note: 'Bc.' },
-    ],
-    skills: [
-      { name: 'React / Next.js', level: 4 },
-      { name: 'TypeScript', level: 4 },
-      { name: 'CSS / Tailwind', level: 5 },
-      { name: 'Node.js', level: 3 },
-    ],
-    languages: [
-      { name: 'Čeština', level: 'Rodilý mluvčí' },
-      { name: 'Angličtina', level: 'B2' },
-    ],
-    certs: [],
+    firstName: '', lastName: '', role: '',
+    email: '', phone: '', location: '',
+    website: '', github: '', summary: '',
+    experience: [], education: [], skills: [],
+    languages: [], certs: [],
   });
 
   let template = $state('modern');
