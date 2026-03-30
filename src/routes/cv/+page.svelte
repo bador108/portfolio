@@ -523,7 +523,7 @@
   :global(*, *::before, *::after) { margin:0; padding:0; box-sizing:border-box; }
   :global(html,body) { height:100%; background:#0f0f0f; font-family:'Inter',sans-serif; overflow-x:hidden; }
 
-  .builder { display:grid; grid-template-columns:360px 1fr; height:100vh; overflow:hidden; }
+  .builder { display:grid; grid-template-columns:460px 1fr; height:100vh; overflow:hidden; }
 
   /* ── PANEL ── */
   .panel { background:#141414; border-right:1px solid rgba(255,255,255,.07); overflow-y:auto; display:flex; flex-direction:column; }
