@@ -57,11 +57,12 @@
 
   function exportPDF() { window.print(); }
 
-  // Helper — zobrazí hodnotu nebo placeholder šedě
   function val(v, placeholder) { return v || placeholder; }
   function hasVal(v) { return v && v.trim() !== ''; }
-  function col(v) { return hasVal(v) ? '#1a1a1a' : '#d1d5db'; }
+  function col(v)       { return hasVal(v) ? '#1a1a1a' : '#d1d5db'; }
   function colAccent(v) { return hasVal(v) ? colorHex : '#d1d5db'; }
+
+  const fullName = $derived((cv.firstName + ' ' + cv.lastName).trim());
 </script>
 
 <svelte:head>
@@ -76,24 +77,25 @@
     <div class="panel-head">
       <a href="/" class="back">← Portfolio</a>
       <span class="panel-title">CV Builder</span>
-      <button class="pdf-btn" onclick={exportPDF}>⬇ PDF</button>
+      <button class="pdf-btn" onclick={exportPDF}>PDF</button>
     </div>
 
-    <div class="pick-row">
-      <span class="pick-lbl">Šablona</span>
-      <div class="pick-btns">
-        {#each TEMPLATES as t}
-          <button class="tpl" class:on={template === t.id} onclick={() => template = t.id}>{t.label}</button>
-        {/each}
+    <div class="controls">
+      <div class="ctrl-group">
+        <span class="ctrl-lbl">Šablona</span>
+        <div class="ctrl-row">
+          {#each TEMPLATES as t}
+            <button class="tpl" class:on={template === t.id} onclick={() => template = t.id}>{t.label}</button>
+          {/each}
+        </div>
       </div>
-    </div>
-
-    <div class="pick-row">
-      <span class="pick-lbl">Barva</span>
-      <div class="pick-btns">
-        {#each COLORS as c}
-          <button class="clr" class:on={colorHex === c.hex} style="background:{c.hex}" title={c.label} onclick={() => colorHex = c.hex}></button>
-        {/each}
+      <div class="ctrl-group">
+        <span class="ctrl-lbl">Barva</span>
+        <div class="ctrl-row">
+          {#each COLORS as c}
+            <button class="clr" class:on={colorHex === c.hex} style="background:{c.hex}" title={c.label} onclick={() => colorHex = c.hex}></button>
+          {/each}
+        </div>
       </div>
     </div>
 
@@ -119,11 +121,12 @@
           <div class="f"><label>Lokalita</label><input bind:value={cv.location} placeholder="Praha" /></div>
           <div class="f"><label>Web / Portfolio</label><input bind:value={cv.website} placeholder="mojeportfolio.cz" /></div>
         </div>
-        <div class="f"><label>GitHub</label><input bind:value={cv.github} placeholder="github.com/username" /></div>
-        <div class="f"><label>Krátký popis</label><textarea bind:value={cv.summary} rows="4" placeholder="Pár vět o sobě, čím se zabýváš a co hledáš..."></textarea></div>
+        <div class="f"><label>GitHub <span class="opt">volitelné</span></label><input bind:value={cv.github} placeholder="github.com/username" /></div>
+        <div class="f"><label>O mně <span class="opt">volitelné</span></label><textarea bind:value={cv.summary} rows="4" placeholder="Pár vět o sobě, čím se zabýváš a co hledáš..."></textarea></div>
       {/if}
 
       {#if activeSection === 'experience'}
+        <p class="section-hint">Pracovní zkušenosti jsou volitelné — zobrazí se jen pokud je přidáš.</p>
         {#each cv.experience as exp, i}
           <div class="card">
             <div class="card-head"><span>Praxe {i+1}</span><button class="rm" onclick={() => removeExp(i)}>✕</button></div>
@@ -131,31 +134,33 @@
             <div class="f"><label>Pozice</label><input bind:value={exp.role} placeholder="Junior Developer" /></div>
             <div class="r2">
               <div class="f"><label>Od</label><input bind:value={exp.from} placeholder="2024" /></div>
-              <div class="f"><label>Do</label><input bind:value={exp.to} placeholder="současnost" /></div>
+              <div class="f"><label>Do <span class="opt">volitelné</span></label><input bind:value={exp.to} placeholder="současnost" /></div>
             </div>
-            <div class="f"><label>Popis</label><textarea bind:value={exp.desc} rows="3" placeholder="Co jsi dělal, čeho dosáhl..."></textarea></div>
+            <div class="f"><label>Popis <span class="opt">volitelné</span></label><textarea bind:value={exp.desc} rows="3" placeholder="Co jsi dělal, čeho dosáhl..."></textarea></div>
           </div>
         {/each}
         <button class="add" onclick={addExp}>+ Přidat pracovní zkušenost</button>
       {/if}
 
       {#if activeSection === 'education'}
+        <p class="section-hint">Vzdělání je volitelné — zobrazí se jen pokud ho přidáš.</p>
         {#each cv.education as edu, i}
           <div class="card">
             <div class="card-head"><span>Škola {i+1}</span><button class="rm" onclick={() => removeEdu(i)}>✕</button></div>
             <div class="f"><label>Škola</label><input bind:value={edu.school} placeholder="Název školy" /></div>
-            <div class="f"><label>Obor</label><input bind:value={edu.field} placeholder="Informatika" /></div>
+            <div class="f"><label>Obor <span class="opt">volitelné</span></label><input bind:value={edu.field} placeholder="Informatika" /></div>
             <div class="r2">
               <div class="f"><label>Od</label><input bind:value={edu.from} placeholder="2022" /></div>
               <div class="f"><label>Do</label><input bind:value={edu.to} placeholder="2026" /></div>
             </div>
-            <div class="f"><label>Poznámka</label><input bind:value={edu.note} placeholder="Maturitní ročník, Bc., ..." /></div>
+            <div class="f"><label>Poznámka <span class="opt">volitelné</span></label><input bind:value={edu.note} placeholder="Maturitní ročník, Bc., ..." /></div>
           </div>
         {/each}
         <button class="add" onclick={addEdu}>+ Přidat vzdělání</button>
       {/if}
 
       {#if activeSection === 'skills'}
+        <p class="section-hint">Dovednosti jsou volitelné.</p>
         {#each cv.skills as skill, i}
           <div class="skill-row">
             <input bind:value={skill.name} placeholder="Dovednost" class="skill-inp" />
@@ -171,6 +176,7 @@
       {/if}
 
       {#if activeSection === 'languages'}
+        <p class="section-hint">Jazyky jsou volitelné.</p>
         {#each cv.languages as lang, i}
           <div class="card">
             <div class="card-head"><span>Jazyk {i+1}</span><button class="rm" onclick={() => removeLang(i)}>✕</button></div>
@@ -184,13 +190,14 @@
       {/if}
 
       {#if activeSection === 'certs'}
+        <p class="section-hint">Certifikáty jsou volitelné.</p>
         {#each cv.certs as cert, i}
           <div class="card">
             <div class="card-head"><span>Certifikát {i+1}</span><button class="rm" onclick={() => removeCert(i)}>✕</button></div>
             <div class="f"><label>Název</label><input bind:value={cert.name} placeholder="Cambridge FCE" /></div>
             <div class="r2">
-              <div class="f"><label>Vydavatel</label><input bind:value={cert.issuer} placeholder="Cambridge Assessment" /></div>
-              <div class="f"><label>Rok</label><input bind:value={cert.year} placeholder="2024" /></div>
+              <div class="f"><label>Vydavatel <span class="opt">volitelné</span></label><input bind:value={cert.issuer} placeholder="Cambridge Assessment" /></div>
+              <div class="f"><label>Rok <span class="opt">volitelné</span></label><input bind:value={cert.year} placeholder="2024" /></div>
             </div>
           </div>
         {/each}
@@ -209,17 +216,17 @@
         <div class="cv">
           <div class="m-head" style="border-bottom:2px solid {colorHex}">
             <div>
-              <div class="m-name" style="color:{col(cv.firstName + cv.lastName)}">
-                {val(cv.firstName || cv.lastName ? `${cv.firstName} ${cv.lastName}`.trim() : '', 'Tvoje celé jméno')}
+              <div class="m-name" style="color:{col(fullName)}">
+                {val(fullName, 'Tvoje celé jméno')}
               </div>
-              <div class="m-role" style="color:{colAccent(cv.role)}">
-                {val(cv.role, 'Pozice / Role')}
-              </div>
+              {#if hasVal(cv.role)}
+                <div class="m-role" style="color:{colorHex}">{cv.role}</div>
+              {/if}
             </div>
             <div class="m-contacts">
-              <span style="color:{col(cv.email)}">✉ {val(cv.email, 'email@example.com')}</span>
-              <span style="color:{col(cv.phone)}">📞 {val(cv.phone, '605 123 456')}</span>
-              <span style="color:{col(cv.location)}">📍 {val(cv.location, 'Město / Region')}</span>
+              {#if hasVal(cv.email)}<span>✉ {cv.email}</span>{/if}
+              {#if hasVal(cv.phone)}<span>📞 {cv.phone}</span>{/if}
+              {#if hasVal(cv.location)}<span>📍 {cv.location}</span>{/if}
               {#if hasVal(cv.website)}<span>🌐 {cv.website}</span>{/if}
               {#if hasVal(cv.github)}<span>⌥ {cv.github}</span>{/if}
             </div>
@@ -227,116 +234,98 @@
 
           <div class="m-body">
             <div class="m-left">
-              <!-- Summary -->
-              <div class="m-sec">
-                <div class="m-sec-title" style="color:{colorHex}">O mně</div>
-                <p class="m-text" style="color:{col(cv.summary)}">
-                  {val(cv.summary, 'Napiš pár vět o sobě — čím se zabýváš, co tě baví a co hledáš. Tento text se zobrazí jako úvod tvého CV.')}
-                </p>
-              </div>
+              {#if hasVal(cv.summary)}
+                <div class="m-sec">
+                  <div class="m-sec-title" style="color:{colorHex}">O mně</div>
+                  <p class="m-text">{cv.summary}</p>
+                </div>
+              {/if}
 
-              <!-- Experience -->
-              <div class="m-sec">
-                <div class="m-sec-title" style="color:{colorHex}">Pracovní zkušenosti</div>
-                {#if cv.experience.length === 0}
-                  <p class="m-text ph">Přidej pracovní zkušenosti vlevo v sekci "Praxe".</p>
-                {:else}
+              {#if cv.experience.length > 0}
+                <div class="m-sec">
+                  <div class="m-sec-title" style="color:{colorHex}">Pracovní zkušenosti</div>
                   {#each cv.experience as exp}
                     <div class="m-entry">
                       <div class="m-entry-row">
                         <strong style="color:{col(exp.role)}">{val(exp.role, 'Název pozice')}</strong>
-                        <span class="m-date">{val(exp.from, '2024')}{exp.to ? ` — ${exp.to}` : ' — současnost'}</span>
+                        {#if hasVal(exp.from)}
+                          <span class="m-date">{exp.from}{hasVal(exp.to) ? ` — ${exp.to}` : ' — současnost'}</span>
+                        {/if}
                       </div>
-                      <div class="m-company" style="color:{col(exp.company)}">{val(exp.company, 'Název firmy')}</div>
-                      <p class="m-desc" style="color:{col(exp.desc)}">{val(exp.desc, 'Popis pracovní náplně a dosažených výsledků.')}</p>
+                      {#if hasVal(exp.company)}<div class="m-company">{exp.company}</div>{/if}
+                      {#if hasVal(exp.desc)}<p class="m-desc">{exp.desc}</p>{/if}
                     </div>
                   {/each}
-                {/if}
-              </div>
+                </div>
+              {/if}
 
-              <!-- Education -->
-              <div class="m-sec">
-                <div class="m-sec-title" style="color:{colorHex}">Vzdělání</div>
-                {#if cv.education.length === 0}
-                  <p class="m-text ph">Přidej vzdělání vlevo v sekci "Vzdělání".</p>
-                {:else}
+              {#if cv.education.length > 0}
+                <div class="m-sec">
+                  <div class="m-sec-title" style="color:{colorHex}">Vzdělání</div>
                   {#each cv.education as edu}
                     <div class="m-entry">
                       <div class="m-entry-row">
                         <strong style="color:{col(edu.school)}">{val(edu.school, 'Název školy')}</strong>
-                        <span class="m-date">{val(edu.from, '2022')}{edu.to ? ` — ${edu.to}` : ''}</span>
+                        {#if hasVal(edu.from)}
+                          <span class="m-date">{edu.from}{hasVal(edu.to) ? ` — ${edu.to}` : ''}</span>
+                        {/if}
                       </div>
-                      <div class="m-company" style="color:{col(edu.field)}">{val(edu.field, 'Obor studia')}</div>
+                      {#if hasVal(edu.field)}<div class="m-company">{edu.field}</div>{/if}
                       {#if hasVal(edu.note)}<p class="m-desc">{edu.note}</p>{/if}
                     </div>
                   {/each}
-                {/if}
-              </div>
+                </div>
+              {/if}
             </div>
 
             <div class="m-right">
-              <!-- Skills -->
-              <div class="m-sec">
-                <div class="m-sec-title" style="color:{colorHex}">Dovednosti</div>
-                {#if cv.skills.length === 0}
-                  {#each ['Dovednost 1','Dovednost 2','Dovednost 3'] as ph}
-                    <div class="m-skill">
-                      <span style="color:#d1d5db">{ph}</span>
-                      <div class="m-dots">
-                        {#each [1,2,3,4,5] as l}
-                          <div class="m-dot" style="background:#e5e5e5"></div>
-                        {/each}
-                      </div>
-                    </div>
-                  {/each}
-                {:else}
+              {#if cv.skills.length > 0}
+                <div class="m-sec">
+                  <div class="m-sec-title" style="color:{colorHex}">Dovednosti</div>
                   {#each cv.skills as s}
-                    <div class="m-skill">
-                      <span style="color:{col(s.name)}">{val(s.name, 'Dovednost')}</span>
-                      <div class="m-dots">
-                        {#each [1,2,3,4,5] as l}
-                          <div class="m-dot" style="background:{l <= s.level ? colorHex : '#e5e5e5'}"></div>
-                        {/each}
+                    {#if hasVal(s.name)}
+                      <div class="m-skill">
+                        <span>{s.name}</span>
+                        <div class="m-dots">
+                          {#each [1,2,3,4,5] as l}
+                            <div class="m-dot" style="background:{l <= s.level ? colorHex : '#e5e5e5'}"></div>
+                          {/each}
+                        </div>
                       </div>
-                    </div>
+                    {/if}
                   {/each}
-                {/if}
-              </div>
+                </div>
+              {/if}
 
-              <!-- Languages -->
-              <div class="m-sec">
-                <div class="m-sec-title" style="color:{colorHex}">Jazyky</div>
-                {#if cv.languages.length === 0}
-                  {#each [['Čeština','Rodilý mluvčí'],['Angličtina','B2']] as [n,l]}
-                    <div class="m-lang">
-                      <span class="m-lang-n" style="color:#d1d5db">{n}</span>
-                      <span class="m-lang-l" style="color:#d1d5db">{l}</span>
-                    </div>
-                  {/each}
-                {:else}
+              {#if cv.languages.length > 0}
+                <div class="m-sec">
+                  <div class="m-sec-title" style="color:{colorHex}">Jazyky</div>
                   {#each cv.languages as l}
-                    <div class="m-lang">
-                      <span class="m-lang-n" style="color:{col(l.name)}">{val(l.name, 'Jazyk')}</span>
-                      <span class="m-lang-l" style="color:{col(l.level)}">{val(l.level, 'Úroveň')}</span>
-                    </div>
+                    {#if hasVal(l.name)}
+                      <div class="m-lang">
+                        <span class="m-lang-n">{l.name}</span>
+                        {#if hasVal(l.level)}<span class="m-lang-l">{l.level}</span>{/if}
+                      </div>
+                    {/if}
                   {/each}
-                {/if}
-              </div>
+                </div>
+              {/if}
 
-              <!-- Certs -->
-              <div class="m-sec">
-                <div class="m-sec-title" style="color:{colorHex}">Certifikáty</div>
-                {#if cv.certs.length === 0}
-                  <p class="m-text ph">Přidej certifikáty v sekci "Certifikáty".</p>
-                {:else}
+              {#if cv.certs.length > 0}
+                <div class="m-sec">
+                  <div class="m-sec-title" style="color:{colorHex}">Certifikáty</div>
                   {#each cv.certs as c}
-                    <div class="m-cert">
-                      <strong style="color:{col(c.name)}">{val(c.name, 'Název certifikátu')}</strong>
-                      <span>{val(c.issuer, 'Vydavatel')}{c.year ? ` · ${c.year}` : ''}</span>
-                    </div>
+                    {#if hasVal(c.name)}
+                      <div class="m-cert">
+                        <strong>{c.name}</strong>
+                        {#if hasVal(c.issuer) || hasVal(c.year)}
+                          <span>{c.issuer}{c.year ? ` · ${c.year}` : ''}</span>
+                        {/if}
+                      </div>
+                    {/if}
                   {/each}
-                {/if}
-              </div>
+                </div>
+              {/if}
             </div>
           </div>
         </div>
@@ -347,22 +336,22 @@
         <div class="cv">
           <div class="n-wrap">
             <div>
-              <div class="n-name" style="color:{col(cv.firstName + cv.lastName)}">
-                {val(cv.firstName || cv.lastName ? `${cv.firstName} ${cv.lastName}`.trim() : '', 'Tvoje celé jméno')}
-              </div>
-              <div class="n-role" style="color:{col(cv.role)}">{val(cv.role, 'Pozice / Role')}</div>
+              <div class="n-name" style="color:{col(fullName)}">{val(fullName, 'Tvoje celé jméno')}</div>
+              {#if hasVal(cv.role)}<div class="n-role">{cv.role}</div>{/if}
             </div>
             <div class="n-contacts">
-              <span style="color:{col(cv.email)}">{val(cv.email, 'email@example.com')}</span>
-              <span style="color:{col(cv.phone)}">{val(cv.phone, '605 123 456')}</span>
-              <span style="color:{col(cv.location)}">{val(cv.location, 'Město')}</span>
+              {#if hasVal(cv.email)}<span>{cv.email}</span>{/if}
+              {#if hasVal(cv.phone)}<span>{cv.phone}</span>{/if}
+              {#if hasVal(cv.location)}<span>{cv.location}</span>{/if}
               {#if hasVal(cv.website)}<span>{cv.website}</span>{/if}
+              {#if hasVal(cv.github)}<span>{cv.github}</span>{/if}
             </div>
           </div>
           <div class="n-line" style="background:{colorHex}"></div>
-          <p class="n-summary" style="color:{col(cv.summary)}">
-            {val(cv.summary, 'Krátký popis — napiš pár vět o sobě, svých zkušenostech a cílech. Tento text se zobrazí jako úvod.')}
-          </p>
+
+          {#if hasVal(cv.summary)}
+            <p class="n-summary">{cv.summary}</p>
+          {/if}
 
           {#if cv.experience.length > 0}
             <div class="n-sec">
@@ -371,17 +360,12 @@
                 <div class="n-entry">
                   <div class="n-entry-row">
                     <strong style="color:{col(exp.role)}">{val(exp.role, 'Pozice')}</strong>
-                    <span>{exp.from}{exp.to ? ` – ${exp.to}` : ''}</span>
+                    {#if hasVal(exp.from)}<span>{exp.from}{hasVal(exp.to) ? ` – ${exp.to}` : ''}</span>{/if}
                   </div>
-                  <div class="n-sub" style="color:{col(exp.company)}">{val(exp.company, 'Firma')}</div>
+                  {#if hasVal(exp.company)}<div class="n-sub">{exp.company}</div>{/if}
                   {#if hasVal(exp.desc)}<p class="n-desc">{exp.desc}</p>{/if}
                 </div>
               {/each}
-            </div>
-          {:else}
-            <div class="n-sec">
-              <div class="n-title" style="color:{colorHex}">PRACOVNÍ ZKUŠENOSTI</div>
-              <p class="n-desc ph">Přidej pracovní zkušenosti vlevo.</p>
             </div>
           {/if}
 
@@ -392,49 +376,38 @@
                 <div class="n-entry">
                   <div class="n-entry-row">
                     <strong style="color:{col(edu.school)}">{val(edu.school, 'Škola')}</strong>
-                    <span>{edu.from}{edu.to ? ` – ${edu.to}` : ''}</span>
+                    {#if hasVal(edu.from)}<span>{edu.from}{hasVal(edu.to) ? ` – ${edu.to}` : ''}</span>{/if}
                   </div>
-                  <div class="n-sub">{edu.field}{edu.note ? ` · ${edu.note}` : ''}</div>
+                  {#if hasVal(edu.field)}<div class="n-sub">{edu.field}{hasVal(edu.note) ? ` · ${edu.note}` : ''}</div>{/if}
                 </div>
               {/each}
             </div>
-          {:else}
-            <div class="n-sec">
-              <div class="n-title" style="color:{colorHex}">VZDĚLÁNÍ</div>
-              <p class="n-desc ph">Přidej vzdělání vlevo.</p>
-            </div>
           {/if}
 
-          <div class="n-bottom">
-            <div class="n-sec half">
-              <div class="n-title" style="color:{colorHex}">DOVEDNOSTI</div>
-              <div class="n-tags">
-                {#if cv.skills.length === 0}
-                  {#each ['Dovednost 1','Dovednost 2','Dovednost 3'] as ph}
-                    <span class="n-tag" style="color:#d1d5db;border-color:#e5e7eb">{ph}</span>
-                  {/each}
-                {:else}
-                  {#each cv.skills as s}{#if s.name}<span class="n-tag">{s.name}</span>{/if}{/each}
-                {/if}
-              </div>
-            </div>
-            <div class="n-sec half">
-              <div class="n-title" style="color:{colorHex}">JAZYKY</div>
-              {#if cv.languages.length === 0}
-                {#each [['Čeština','Rodilý mluvčí'],['Angličtina','B2']] as [n,l]}
-                  <div class="n-lang" style="color:#d1d5db"><strong style="color:#d1d5db">{n}</strong> — {l}</div>
-                {/each}
-              {:else}
-                {#each cv.languages as l}{#if l.name}<div class="n-lang"><strong>{l.name}</strong> — {l.level}</div>{/if}{/each}
+          {#if cv.skills.length > 0 || cv.languages.length > 0 || cv.certs.length > 0}
+            <div class="n-bottom">
+              {#if cv.skills.length > 0}
+                <div class="n-sec half">
+                  <div class="n-title" style="color:{colorHex}">DOVEDNOSTI</div>
+                  <div class="n-tags">
+                    {#each cv.skills as s}{#if hasVal(s.name)}<span class="n-tag">{s.name}</span>{/if}{/each}
+                  </div>
+                </div>
+              {/if}
+              {#if cv.languages.length > 0}
+                <div class="n-sec half">
+                  <div class="n-title" style="color:{colorHex}">JAZYKY</div>
+                  {#each cv.languages as l}{#if hasVal(l.name)}<div class="n-lang"><strong>{l.name}</strong>{hasVal(l.level) ? ` — ${l.level}` : ''}</div>{/if}{/each}
+                </div>
+              {/if}
+              {#if cv.certs.length > 0}
+                <div class="n-sec half">
+                  <div class="n-title" style="color:{colorHex}">CERTIFIKÁTY</div>
+                  {#each cv.certs as c}{#if hasVal(c.name)}<div class="n-lang"><strong>{c.name}</strong>{hasVal(c.year) ? ` (${c.year})` : ''}</div>{/if}{/each}
+                </div>
               {/if}
             </div>
-            {#if cv.certs.length > 0}
-              <div class="n-sec half">
-                <div class="n-title" style="color:{colorHex}">CERTIFIKÁTY</div>
-                {#each cv.certs as c}{#if c.name}<div class="n-lang"><strong>{c.name}</strong>{c.year ? ` (${c.year})` : ''}</div>{/if}{/each}
-              </div>
-            {/if}
-          </div>
+          {/if}
         </div>
       {/if}
 
@@ -442,98 +415,102 @@
       {#if template === 'classic'}
         <div class="cv">
           <div class="c-head" style="background:{colorHex}">
-            <div class="c-name">{val(cv.firstName || cv.lastName ? `${cv.firstName} ${cv.lastName}`.trim() : '', 'Tvoje celé jméno')}</div>
-            <div class="c-role">{val(cv.role, 'Pozice / Role')}</div>
+            <div class="c-name">{val(fullName, 'Tvoje celé jméno')}</div>
+            {#if hasVal(cv.role)}<div class="c-role">{cv.role}</div>{/if}
             <div class="c-contacts">
-              <span>✉ {val(cv.email, 'email@example.com')}</span>
-              <span>📞 {val(cv.phone, '605 123 456')}</span>
-              <span>📍 {val(cv.location, 'Město')}</span>
+              {#if hasVal(cv.email)}<span>✉ {cv.email}</span>{/if}
+              {#if hasVal(cv.phone)}<span>📞 {cv.phone}</span>{/if}
+              {#if hasVal(cv.location)}<span>📍 {cv.location}</span>{/if}
               {#if hasVal(cv.website)}<span>🌐 {cv.website}</span>{/if}
+              {#if hasVal(cv.github)}<span>⌥ {cv.github}</span>{/if}
             </div>
           </div>
           <div class="c-body">
             <div class="c-main">
-              <div class="c-sec">
-                <div class="c-title" style="border-bottom:2px solid {colorHex}">Profil</div>
-                <p class="c-text" style="color:{col(cv.summary)}">
-                  {val(cv.summary, 'Krátký popis — napiš pár vět o sobě, svých zkušenostech a cílech.')}
-                </p>
-              </div>
-              <div class="c-sec">
-                <div class="c-title" style="border-bottom:2px solid {colorHex}">Pracovní zkušenosti</div>
-                {#if cv.experience.length === 0}
-                  <p class="c-text" style="color:#d1d5db">Přidej pracovní zkušenosti vlevo v sekci "Praxe".</p>
-                {:else}
+              {#if hasVal(cv.summary)}
+                <div class="c-sec">
+                  <div class="c-title" style="border-bottom:2px solid {colorHex}">Profil</div>
+                  <p class="c-text">{cv.summary}</p>
+                </div>
+              {/if}
+
+              {#if cv.experience.length > 0}
+                <div class="c-sec">
+                  <div class="c-title" style="border-bottom:2px solid {colorHex}">Pracovní zkušenosti</div>
                   {#each cv.experience as exp}
                     <div class="c-entry">
                       <div class="c-dot" style="background:{colorHex}"></div>
                       <div>
-                        <div class="c-entry-title" style="color:{col(exp.role)}">{val(exp.role, 'Pozice')} — <em style="color:{col(exp.company)}">{val(exp.company, 'Firma')}</em></div>
-                        <div class="c-entry-date">{exp.from}{exp.to ? ` – ${exp.to}` : ''}</div>
+                        <div class="c-entry-title">
+                          {#if hasVal(exp.role)}<strong>{exp.role}</strong>{/if}
+                          {#if hasVal(exp.company)}{hasVal(exp.role) ? ' — ' : ''}<em>{exp.company}</em>{/if}
+                        </div>
+                        {#if hasVal(exp.from)}<div class="c-entry-date">{exp.from}{hasVal(exp.to) ? ` – ${exp.to}` : ''}</div>{/if}
                         {#if hasVal(exp.desc)}<p class="c-text sm">{exp.desc}</p>{/if}
                       </div>
                     </div>
                   {/each}
-                {/if}
-              </div>
-              <div class="c-sec">
-                <div class="c-title" style="border-bottom:2px solid {colorHex}">Vzdělání</div>
-                {#if cv.education.length === 0}
-                  <p class="c-text" style="color:#d1d5db">Přidej vzdělání vlevo v sekci "Vzdělání".</p>
-                {:else}
+                </div>
+              {/if}
+
+              {#if cv.education.length > 0}
+                <div class="c-sec">
+                  <div class="c-title" style="border-bottom:2px solid {colorHex}">Vzdělání</div>
                   {#each cv.education as edu}
                     <div class="c-entry">
                       <div class="c-dot" style="background:{colorHex}"></div>
                       <div>
-                        <div class="c-entry-title" style="color:{col(edu.school)}">{val(edu.school, 'Škola')}</div>
-                        <div class="c-entry-date">{edu.field}{edu.from ? ` · ${edu.from}` : ''}{edu.to ? ` – ${edu.to}` : ''}</div>
+                        <div class="c-entry-title">{val(edu.school, 'Škola')}</div>
+                        <div class="c-entry-date">
+                          {#if hasVal(edu.field)}{edu.field}{/if}
+                          {#if hasVal(edu.from)} · {edu.from}{hasVal(edu.to) ? ` – ${edu.to}` : ''}{/if}
+                        </div>
                         {#if hasVal(edu.note)}<p class="c-text sm">{edu.note}</p>{/if}
                       </div>
                     </div>
                   {/each}
-                {/if}
-              </div>
-            </div>
-            <div class="c-side">
-              <div class="c-sec">
-                <div class="c-title" style="border-bottom:2px solid {colorHex}">Dovednosti</div>
-                {#if cv.skills.length === 0}
-                  {#each ['Dovednost 1','Dovednost 2','Dovednost 3'] as ph}
-                    <div class="c-skill">
-                      <span style="color:#d1d5db">{ph}</span>
-                      <div class="c-bar"><div style="width:60%;background:#e5e7eb"></div></div>
-                    </div>
-                  {/each}
-                {:else}
-                  {#each cv.skills as s}{#if s.name}
-                    <div class="c-skill">
-                      <span style="color:{col(s.name)}">{val(s.name,'Dovednost')}</span>
-                      <div class="c-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
-                    </div>
-                  {/if}{/each}
-                {/if}
-              </div>
-              <div class="c-sec">
-                <div class="c-title" style="border-bottom:2px solid {colorHex}">Jazyky</div>
-                {#if cv.languages.length === 0}
-                  {#each [['Čeština','Rodilý mluvčí'],['Angličtina','B2']] as [n,l]}
-                    <div class="c-lang"><strong style="color:#d1d5db">{n}</strong><span style="color:#d1d5db">{l}</span></div>
-                  {/each}
-                {:else}
-                  {#each cv.languages as l}{#if l.name}
-                    <div class="c-lang"><strong>{l.name}</strong><span>{l.level}</span></div>
-                  {/if}{/each}
-                {/if}
-              </div>
-              {#if cv.certs.length > 0}
-                <div class="c-sec">
-                  <div class="c-title" style="border-bottom:2px solid {colorHex}">Certifikáty</div>
-                  {#each cv.certs as c}{#if c.name}
-                    <div class="c-cert"><strong>{c.name}</strong><span>{c.issuer}{c.year ? ` · ${c.year}` : ''}</span></div>
-                  {/if}{/each}
                 </div>
               {/if}
             </div>
+
+            {#if cv.skills.length > 0 || cv.languages.length > 0 || cv.certs.length > 0}
+              <div class="c-side">
+                {#if cv.skills.length > 0}
+                  <div class="c-sec">
+                    <div class="c-title" style="border-bottom:2px solid {colorHex}">Dovednosti</div>
+                    {#each cv.skills as s}{#if hasVal(s.name)}
+                      <div class="c-skill">
+                        <span>{s.name}</span>
+                        <div class="c-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
+                      </div>
+                    {/if}{/each}
+                  </div>
+                {/if}
+
+                {#if cv.languages.length > 0}
+                  <div class="c-sec">
+                    <div class="c-title" style="border-bottom:2px solid {colorHex}">Jazyky</div>
+                    {#each cv.languages as l}{#if hasVal(l.name)}
+                      <div class="c-lang"><strong>{l.name}</strong>{#if hasVal(l.level)}<span>{l.level}</span>{/if}</div>
+                    {/if}{/each}
+                  </div>
+                {/if}
+
+                {#if cv.certs.length > 0}
+                  <div class="c-sec">
+                    <div class="c-title" style="border-bottom:2px solid {colorHex}">Certifikáty</div>
+                    {#each cv.certs as c}{#if hasVal(c.name)}
+                      <div class="c-cert">
+                        <strong>{c.name}</strong>
+                        {#if hasVal(c.issuer) || hasVal(c.year)}<span>{c.issuer}{c.year ? ` · ${c.year}` : ''}</span>{/if}
+                      </div>
+                    {/if}{/each}
+                  </div>
+                {/if}
+              </div>
+            {:else}
+              <div class="c-side c-side-empty"></div>
+            {/if}
           </div>
         </div>
       {/if}
@@ -544,139 +521,150 @@
 
 <style>
   :global(*, *::before, *::after) { margin:0; padding:0; box-sizing:border-box; }
-  :global(html,body) { height:100%; background:#111; font-family:'Inter',sans-serif; }
+  :global(html,body) { height:100%; background:#0f0f0f; font-family:'Inter',sans-serif; }
 
-  .builder { display:grid; grid-template-columns:370px 1fr; height:100vh; overflow:hidden; }
+  .builder { display:grid; grid-template-columns:360px 1fr; height:100vh; overflow:hidden; }
 
-  .panel { background:#161616; border-right:1px solid rgba(255,255,255,.08); overflow-y:auto; display:flex; flex-direction:column; }
+  /* ── PANEL ── */
+  .panel { background:#141414; border-right:1px solid rgba(255,255,255,.07); overflow-y:auto; display:flex; flex-direction:column; }
   .panel::-webkit-scrollbar { width:3px; }
-  .panel::-webkit-scrollbar-thumb { background:rgba(255,255,255,.15); }
+  .panel::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:2px; }
 
-  .panel-head { padding:18px 22px; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; gap:10px; position:sticky; top:0; background:#161616; z-index:10; }
-  .back { font-size:11px; font-weight:600; color:rgba(255,255,255,.35); text-decoration:none; transition:color .2s; }
-  .back:hover { color:#fff; }
-  .panel-title { font-size:16px; font-weight:800; color:#fff; flex:1; font-family:'Bricolage Grotesque',sans-serif; }
-  .pdf-btn { font-size:11px; font-weight:700; padding:7px 14px; background:#fff; color:#111; border:none; cursor:pointer; }
+  .panel-head { padding:16px 20px; border-bottom:1px solid rgba(255,255,255,.07); display:flex; align-items:center; gap:10px; position:sticky; top:0; background:#141414; z-index:10; }
+  .back { font-size:11px; font-weight:600; color:rgba(255,255,255,.3); text-decoration:none; transition:color .2s; white-space:nowrap; }
+  .back:hover { color:rgba(255,255,255,.7); }
+  .panel-title { font-size:15px; font-weight:800; color:#fff; flex:1; font-family:'Bricolage Grotesque',sans-serif; letter-spacing:-.3px; }
+  .pdf-btn { font-size:11px; font-weight:700; padding:6px 13px; background:#fff; color:#111; border:none; cursor:pointer; border-radius:3px; letter-spacing:.5px; transition:opacity .15s; }
   .pdf-btn:hover { opacity:.85; }
 
-  .pick-row { display:flex; align-items:center; gap:10px; padding:10px 22px; border-bottom:1px solid rgba(255,255,255,.05); }
-  .pick-lbl { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.3); min-width:52px; }
-  .pick-btns { display:flex; gap:6px; align-items:center; }
+  .controls { border-bottom:1px solid rgba(255,255,255,.07); padding:12px 20px; display:flex; flex-direction:column; gap:10px; }
+  .ctrl-group { display:flex; align-items:center; gap:12px; }
+  .ctrl-lbl { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,.28); min-width:48px; }
+  .ctrl-row { display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
 
-  .tpl { font-size:11px; font-weight:600; padding:5px 11px; background:rgba(255,255,255,.06); color:rgba(255,255,255,.4); border:1px solid rgba(255,255,255,.1); cursor:pointer; transition:all .15s; }
+  .tpl { font-size:11px; font-weight:600; padding:5px 11px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.38); border:1px solid rgba(255,255,255,.09); cursor:pointer; transition:all .15s; border-radius:3px; }
   .tpl.on { background:#fff; color:#111; border-color:#fff; }
+  .tpl:hover:not(.on) { background:rgba(255,255,255,.09); color:rgba(255,255,255,.7); }
 
-  .clr { width:22px; height:22px; border-radius:50%; border:3px solid transparent; cursor:pointer; transition:border-color .15s; }
-  .clr.on { border-color:#fff; }
+  .clr { width:20px; height:20px; border-radius:50%; border:2px solid transparent; cursor:pointer; transition:transform .15s; outline:2px solid transparent; }
+  .clr.on { outline:2px solid rgba(255,255,255,.6); outline-offset:2px; }
+  .clr:hover { transform:scale(1.15); }
 
-  .tabs { display:flex; flex-wrap:wrap; gap:4px; padding:10px 22px; border-bottom:1px solid rgba(255,255,255,.07); }
-  .tab { font-size:11px; font-weight:600; padding:5px 9px; background:transparent; color:rgba(255,255,255,.35); border:1px solid transparent; border-radius:4px; cursor:pointer; transition:all .15s; }
-  .tab.on { background:rgba(255,255,255,.1); color:#fff; border-color:rgba(255,255,255,.15); }
-  .tab:hover:not(.on) { color:rgba(255,255,255,.65); }
+  .tabs { display:flex; flex-wrap:wrap; gap:3px; padding:10px 20px; border-bottom:1px solid rgba(255,255,255,.07); }
+  .tab { font-size:11px; font-weight:600; padding:5px 9px; background:transparent; color:rgba(255,255,255,.32); border:1px solid transparent; border-radius:4px; cursor:pointer; transition:all .15s; }
+  .tab.on { background:rgba(255,255,255,.09); color:#fff; border-color:rgba(255,255,255,.13); }
+  .tab:hover:not(.on) { color:rgba(255,255,255,.6); }
 
-  .form-body { padding:18px 22px; display:flex; flex-direction:column; gap:12px; }
-  .r2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .form-body { padding:16px 20px; display:flex; flex-direction:column; gap:11px; }
+  .section-hint { font-size:10px; color:rgba(255,255,255,.28); font-style:italic; line-height:1.5; }
+  .r2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
   .f { display:flex; flex-direction:column; gap:4px; }
-  .f label { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.3); }
-  .f input, .f textarea { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#fff; font-family:'Inter',sans-serif; font-size:13px; padding:8px 11px; outline:none; resize:vertical; border-radius:4px; transition:border-color .2s; }
-  .f input:focus, .f textarea:focus { border-color:rgba(255,255,255,.4); }
-  .f input::placeholder, .f textarea::placeholder { color:rgba(255,255,255,.2); }
+  .f label { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,.28); display:flex; align-items:center; gap:5px; }
+  .opt { font-size:8px; font-weight:500; letter-spacing:.5px; color:rgba(255,255,255,.18); text-transform:none; border:1px solid rgba(255,255,255,.1); padding:1px 5px; border-radius:2px; }
+  .f input, .f textarea { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); color:#fff; font-family:'Inter',sans-serif; font-size:13px; padding:8px 10px; outline:none; resize:vertical; border-radius:4px; transition:border-color .2s, background .2s; }
+  .f input:focus, .f textarea:focus { border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.06); }
+  .f input::placeholder, .f textarea::placeholder { color:rgba(255,255,255,.18); }
 
-  .card { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.07); padding:13px; border-radius:6px; display:flex; flex-direction:column; gap:9px; }
+  .card { background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.06); padding:13px; border-radius:6px; display:flex; flex-direction:column; gap:9px; }
   .card-head { display:flex; justify-content:space-between; align-items:center; }
-  .card-head span { font-size:10px; font-weight:700; letter-spacing:1px; color:rgba(255,255,255,.35); text-transform:uppercase; }
-  .rm { font-size:11px; background:rgba(255,80,80,.15); color:rgba(255,100,100,.8); border:none; width:22px; height:22px; border-radius:50%; cursor:pointer; }
+  .card-head span { font-size:9px; font-weight:700; letter-spacing:1.5px; color:rgba(255,255,255,.3); text-transform:uppercase; }
+  .rm { font-size:10px; background:rgba(255,80,80,.12); color:rgba(255,100,100,.7); border:none; width:22px; height:22px; border-radius:50%; cursor:pointer; transition:background .15s; display:flex; align-items:center; justify-content:center; }
+  .rm:hover { background:rgba(255,80,80,.25); color:#ff6464; }
   .rm.sm { width:18px; height:18px; font-size:9px; }
-  .add { font-size:12px; font-weight:700; padding:9px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.4); border:1px dashed rgba(255,255,255,.15); border-radius:4px; cursor:pointer; transition:all .2s; }
-  .add:hover { background:rgba(255,255,255,.1); color:#fff; }
+  .add { font-size:12px; font-weight:600; padding:9px; background:transparent; color:rgba(255,255,255,.32); border:1px dashed rgba(255,255,255,.12); border-radius:4px; cursor:pointer; transition:all .2s; }
+  .add:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.7); border-color:rgba(255,255,255,.25); }
 
   .skill-row { display:flex; align-items:center; gap:8px; }
-  .skill-inp { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); color:#fff; font-size:13px; padding:8px 11px; outline:none; border-radius:4px; }
+  .skill-inp { flex:1; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.09); color:#fff; font-size:13px; padding:8px 10px; outline:none; border-radius:4px; transition:border-color .2s; }
+  .skill-inp:focus { border-color:rgba(255,255,255,.35); }
+  .skill-inp::placeholder { color:rgba(255,255,255,.18); }
   .dots { display:flex; gap:4px; }
-  .dot-btn { width:13px; height:13px; border-radius:50%; background:rgba(255,255,255,.12); border:none; cursor:pointer; transition:background .15s; }
+  .dot-btn { width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.1); border:none; cursor:pointer; transition:background .15s; }
   .dot-btn.on { background:#fff; }
 
-  .preview { background:#1a1a1a; overflow-y:auto; display:flex; justify-content:center; padding:28px; }
+  /* ── PREVIEW ── */
+  .preview { background:#181818; overflow-y:auto; display:flex; justify-content:center; padding:28px; }
   .preview::-webkit-scrollbar { width:4px; }
-  .preview::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); }
+  .preview::-webkit-scrollbar-thumb { background:rgba(255,255,255,.08); border-radius:2px; }
   .preview-inner { width:100%; max-width:794px; }
 
   /* ── CV BASE ── */
-  .cv { background:#fff; color:#1a1a1a; font-family:'Inter',sans-serif; font-size:10pt; line-height:1.5; box-shadow:0 8px 40px rgba(0,0,0,.5); min-height:297mm; }
-  .ph { color:#d1d5db !important; font-style:italic; }
+  .cv { background:#fff; color:#1a1a1a; font-family:'Inter',sans-serif; font-size:10pt; line-height:1.5; box-shadow:0 12px 48px rgba(0,0,0,.55); min-height:297mm; }
 
   /* MODERN */
-  .m-head { padding:32px 36px 24px; display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
-  .m-name { font-family:'Bricolage Grotesque',sans-serif; font-size:26pt; font-weight:800; letter-spacing:-1px; line-height:1; }
-  .m-role { font-size:11pt; font-weight:500; margin-top:5px; }
-  .m-contacts { display:flex; flex-direction:column; gap:4px; text-align:right; font-size:8pt; }
-  .m-body { display:grid; grid-template-columns:1fr 200px; padding:24px 36px; gap:28px; }
-  .m-sec { margin-bottom:20px; }
-  .m-sec-title { font-family:'Bricolage Grotesque',sans-serif; font-size:8pt; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; padding-bottom:5px; border-bottom:1px solid #eee; }
-  .m-text { font-size:9pt; line-height:1.7; }
+  .m-head { padding:30px 34px 22px; display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+  .m-name { font-family:'Bricolage Grotesque',sans-serif; font-size:25pt; font-weight:800; letter-spacing:-1px; line-height:1; }
+  .m-role { font-size:10.5pt; font-weight:500; margin-top:5px; }
+  .m-contacts { display:flex; flex-direction:column; gap:4px; text-align:right; font-size:8pt; color:#444; }
+  .m-body { display:grid; grid-template-columns:1fr 190px; padding:22px 34px; gap:26px; }
+  .m-sec { margin-bottom:18px; }
+  .m-sec-title { font-family:'Bricolage Grotesque',sans-serif; font-size:7.5pt; font-weight:800; letter-spacing:2px; text-transform:uppercase; margin-bottom:9px; padding-bottom:5px; border-bottom:1px solid #eee; }
+  .m-text { font-size:9pt; line-height:1.7; color:#333; }
   .m-entry { margin-bottom:12px; }
   .m-entry-row { display:flex; justify-content:space-between; align-items:baseline; }
-  .m-entry-row strong { font-size:10pt; font-weight:700; }
-  .m-date { font-size:8pt; color:#888; }
+  .m-entry-row strong { font-size:9.5pt; font-weight:700; }
+  .m-date { font-size:8pt; color:#999; }
   .m-company { font-size:8.5pt; color:#666; margin:2px 0 4px; }
   .m-desc { font-size:8.5pt; color:#555; line-height:1.6; }
-  .m-skill { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; font-size:9pt; }
+  .m-skill { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; font-size:9pt; }
   .m-dots { display:flex; gap:4px; }
-  .m-dot { width:9px; height:9px; border-radius:50%; }
+  .m-dot { width:8px; height:8px; border-radius:50%; }
   .m-lang { display:flex; justify-content:space-between; margin-bottom:7px; padding-bottom:7px; border-bottom:1px solid #f0f0f0; }
   .m-lang-n { font-size:9pt; font-weight:600; }
-  .m-lang-l { font-size:8pt; }
+  .m-lang-l { font-size:8pt; color:#777; }
   .m-cert { margin-bottom:9px; }
   .m-cert strong { display:block; font-size:9pt; }
   .m-cert span { font-size:8pt; color:#777; }
 
   /* MINIMAL */
-  .n-wrap { display:flex; justify-content:space-between; align-items:flex-start; padding:40px 48px 18px; }
-  .n-name { font-family:'Bricolage Grotesque',sans-serif; font-size:28pt; font-weight:800; letter-spacing:-1px; }
-  .n-role { font-size:11pt; margin-top:4px; }
-  .n-contacts { display:flex; flex-direction:column; gap:3px; text-align:right; font-size:8pt; }
-  .n-line { height:2px; margin:0 48px 18px; }
-  .n-summary { font-size:9.5pt; line-height:1.7; margin:0 48px 24px; }
-  .n-sec { margin:0 48px 20px; }
-  .n-sec.half { flex:1; min-width:160px; margin:0; }
-  .n-title { font-size:7.5pt; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; }
-  .n-entry { margin-bottom:13px; padding-bottom:13px; border-bottom:1px solid #f0f0f0; }
+  .n-wrap { display:flex; justify-content:space-between; align-items:flex-start; padding:38px 46px 16px; }
+  .n-name { font-family:'Bricolage Grotesque',sans-serif; font-size:27pt; font-weight:800; letter-spacing:-1px; }
+  .n-role { font-size:10.5pt; color:#555; margin-top:4px; }
+  .n-contacts { display:flex; flex-direction:column; gap:3px; text-align:right; font-size:8pt; color:#666; }
+  .n-line { height:2px; margin:0 46px 16px; }
+  .n-summary { font-size:9.5pt; line-height:1.7; margin:0 46px 22px; color:#333; }
+  .n-sec { margin:0 46px 18px; }
+  .n-sec.half { flex:1; min-width:150px; margin:0; }
+  .n-title { font-size:7.5pt; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:10px; color:#888; }
+  .n-entry { margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f0f0f0; }
+  .n-entry:last-child { border-bottom:none; }
   .n-entry-row { display:flex; justify-content:space-between; align-items:baseline; }
-  .n-entry-row strong { font-size:10pt; font-weight:700; }
+  .n-entry-row strong { font-size:9.5pt; font-weight:700; }
   .n-entry-row span { font-size:8pt; color:#999; }
   .n-sub { font-size:8.5pt; color:#777; margin-top:2px; }
   .n-desc { font-size:8.5pt; color:#555; line-height:1.6; margin-top:4px; }
-  .n-bottom { display:flex; gap:28px; flex-wrap:wrap; margin:0 48px; padding-top:18px; border-top:1px solid #eee; }
+  .n-bottom { display:flex; gap:26px; flex-wrap:wrap; margin:0 46px; padding-top:16px; border-top:1px solid #eee; }
   .n-tags { display:flex; flex-wrap:wrap; gap:5px; }
-  .n-tag { font-size:8pt; padding:2px 9px; border:1px solid #ddd; color:#444; border-radius:2px; }
+  .n-tag { font-size:8pt; padding:2px 8px; border:1px solid #ddd; color:#444; border-radius:2px; }
   .n-lang { font-size:9pt; color:#444; margin-bottom:5px; }
 
   /* CLASSIC */
-  .c-head { padding:32px 36px; color:#fff; }
-  .c-name { font-family:'Lora',serif; font-size:24pt; font-weight:600; }
-  .c-role { font-size:11pt; opacity:.85; margin:5px 0 14px; }
-  .c-contacts { display:flex; gap:18px; flex-wrap:wrap; font-size:8.5pt; opacity:.9; }
-  .c-body { display:grid; grid-template-columns:1fr 190px; }
-  .c-main { padding:24px 28px 24px 36px; border-right:1px solid #eee; }
-  .c-side { padding:24px 20px; background:#f9f9f9; }
-  .c-sec { margin-bottom:20px; }
-  .c-title { font-size:8.5pt; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; padding-bottom:5px; }
+  .c-head { padding:28px 34px; color:#fff; }
+  .c-name { font-family:'Lora',serif; font-size:23pt; font-weight:600; }
+  .c-role { font-size:10.5pt; opacity:.85; margin:4px 0 12px; }
+  .c-contacts { display:flex; gap:16px; flex-wrap:wrap; font-size:8pt; opacity:.88; }
+  .c-body { display:grid; grid-template-columns:1fr 180px; }
+  .c-main { padding:22px 26px 22px 34px; border-right:1px solid #eee; }
+  .c-side { padding:22px 18px; background:#f8f8f8; }
+  .c-side-empty { background:#f8f8f8; }
+  .c-sec { margin-bottom:18px; }
+  .c-title { font-size:8pt; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; padding-bottom:5px; color:#333; }
   .c-text { font-size:9.5pt; color:#444; line-height:1.7; }
   .c-text.sm { font-size:9pt; margin-top:4px; }
   .c-entry { display:flex; gap:10px; margin-bottom:12px; align-items:flex-start; }
-  .c-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
-  .c-entry-title { font-size:10pt; font-weight:700; }
-  .c-entry-title em { font-style:normal; font-weight:400; color:#555; }
+  .c-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+  .c-entry-title { font-size:9.5pt; font-weight:700; }
+  .c-entry-title em { font-style:normal; font-weight:400; color:#666; }
   .c-entry-date { font-size:8pt; color:#999; margin:2px 0; }
   .c-skill { margin-bottom:9px; font-size:9pt; }
-  .c-skill span { display:block; margin-bottom:3px; font-weight:500; }
-  .c-bar { height:4px; background:#e5e5e5; border-radius:2px; overflow:hidden; }
+  .c-skill span { display:block; margin-bottom:3px; font-weight:500; color:#333; }
+  .c-bar { height:3px; background:#e0e0e0; border-radius:2px; overflow:hidden; }
   .c-bar div { height:100%; border-radius:2px; }
-  .c-lang { display:flex; justify-content:space-between; font-size:9pt; margin-bottom:7px; }
-  .c-lang strong { color:#111; }
+  .c-lang { display:flex; justify-content:space-between; font-size:9pt; margin-bottom:7px; align-items:baseline; }
+  .c-lang strong { color:#222; }
   .c-lang span { color:#777; font-size:8pt; }
   .c-cert { margin-bottom:9px; }
-  .c-cert strong { display:block; font-size:9pt; color:#111; }
+  .c-cert strong { display:block; font-size:9pt; color:#222; }
   .c-cert span { font-size:8pt; color:#777; }
 
   /* PRINT */
@@ -687,7 +675,6 @@
     :global(.preview) { display:block !important; padding:0 !important; overflow:visible !important; background:white !important; height:auto !important; }
     :global(.preview-inner) { max-width:100% !important; }
     :global(.cv) { box-shadow:none !important; min-height:auto !important; }
-    :global(.ph) { display:none !important; }
   }
 
   @media (max-width:900px) {
