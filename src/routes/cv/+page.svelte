@@ -88,12 +88,10 @@
   const showEdu   = $derived(cv.education.length  > 0 ? cv.education  : DEMO.education);
   const showSkills= $derived(cv.skills.filter(s=>hasVal(s.name)).length > 0 ? cv.skills.filter(s=>hasVal(s.name)) : DEMO.skills);
   const showLangs = $derived(cv.languages.filter(l=>hasVal(l.name)).length > 0 ? cv.languages.filter(l=>hasVal(l.name)) : DEMO.languages);
-  const isDemo    = {
-    exp:    $derived(cv.experience.length === 0),
-    edu:    $derived(cv.education.length === 0),
-    skills: $derived(cv.skills.filter(s=>hasVal(s.name)).length === 0),
-    langs:  $derived(cv.languages.filter(l=>hasVal(l.name)).length === 0),
-  };
+  const isDemoExp    = $derived(cv.experience.length === 0);
+  const isDemoEdu    = $derived(cv.education.length === 0);
+  const isDemoSkills = $derived(cv.skills.filter(s=>hasVal(s.name)).length === 0);
+  const isDemoLangs  = $derived(cv.languages.filter(l=>hasVal(l.name)).length === 0);
 </script>
 
 <svelte:head>
@@ -260,7 +258,7 @@
             <div class="mod-divider"></div>
             <div class="mod-sec-title">Dovednosti</div>
             {#each showSkills as s}
-              <div class="mod-skill" style="opacity:{isDemo.skills?0.4:1}">
+              <div class="mod-skill" style="opacity:{isDemoSkills?0.4:1}">
                 <span class="mod-skill-name">{s.name}</span>
                 <div class="mod-skill-bar"><div class="mod-skill-fill" style="width:{s.level*20}%"></div></div>
               </div>
@@ -268,7 +266,7 @@
             <div class="mod-divider"></div>
             <div class="mod-sec-title">Jazyky</div>
             {#each showLangs as l}
-              <div class="mod-lang" style="opacity:{isDemo.langs?0.4:1}">
+              <div class="mod-lang" style="opacity:{isDemoLangs?0.4:1}">
                 <span class="mod-lang-n">{l.name}</span>
                 <span class="mod-lang-l">{l.level}</span>
               </div>
@@ -289,7 +287,7 @@
             <div class="mod-sec">
               <div class="mod-title" style="color:{colorHex}">Pracovní zkušenosti</div>
               {#each showExp as exp}
-                <div class="mod-entry" style="opacity:{isDemo.exp?0.4:1}">
+                <div class="mod-entry" style="opacity:{isDemoExp?0.4:1}">
                   <div class="mod-dot" style="background:{colorHex}"></div>
                   <div class="mod-entry-body">
                     <div class="mod-entry-row">
@@ -305,7 +303,7 @@
             <div class="mod-sec">
               <div class="mod-title" style="color:{colorHex}">Vzdělání</div>
               {#each showEdu as edu}
-                <div class="mod-entry" style="opacity:{isDemo.edu?0.4:1}">
+                <div class="mod-entry" style="opacity:{isDemoEdu?0.4:1}">
                   <div class="mod-dot" style="background:{colorHex}"></div>
                   <div class="mod-entry-body">
                     <div class="mod-entry-row">
@@ -342,7 +340,7 @@
           <div class="n-sec">
             <div class="n-title" style="color:{colorHex}">Pracovní zkušenosti</div>
             {#each showExp as exp}
-              <div class="n-entry" style="opacity:{isDemo.exp?0.4:1}">
+              <div class="n-entry" style="opacity:{isDemoExp?0.4:1}">
                 <div class="n-entry-row"><strong>{exp.role}</strong><span>{exp.from}{exp.to ? ` – ${exp.to}` : ''}</span></div>
                 <div class="n-sub">{exp.company}</div>
                 {#if exp.desc}<p class="n-desc">{exp.desc}</p>{/if}
@@ -352,7 +350,7 @@
           <div class="n-sec">
             <div class="n-title" style="color:{colorHex}">Vzdělání</div>
             {#each showEdu as edu}
-              <div class="n-entry" style="opacity:{isDemo.edu?0.4:1}">
+              <div class="n-entry" style="opacity:{isDemoEdu?0.4:1}">
                 <div class="n-entry-row"><strong>{edu.school}</strong>{#if edu.from}<span>{edu.from}{edu.to ? ` – ${edu.to}` : ''}</span>{/if}</div>
                 <div class="n-sub">{edu.field}{edu.note ? ` · ${edu.note}` : ''}</div>
               </div>
@@ -361,14 +359,14 @@
           <div class="n-bottom">
             <div class="n-bot-col">
               <div class="n-title" style="color:{colorHex}">Dovednosti</div>
-              <div class="n-tags" style="opacity:{isDemo.skills?0.4:1}">
+              <div class="n-tags" style="opacity:{isDemoSkills?0.4:1}">
                 {#each showSkills as s}<span class="n-tag" style="border-color:{colorHex};color:{colorHex}">{s.name}</span>{/each}
               </div>
             </div>
             <div class="n-bot-col">
               <div class="n-title" style="color:{colorHex}">Jazyky</div>
               {#each showLangs as l}
-                <div class="n-lang-item" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong> — {l.level}</div>
+                <div class="n-lang-item" style="opacity:{isDemoLangs?0.4:1}"><strong>{l.name}</strong> — {l.level}</div>
               {/each}
             </div>
             {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
@@ -405,7 +403,7 @@
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Pracovní zkušenosti</div>
                 {#each showExp as exp}
-                  <div class="cl-entry" style="opacity:{isDemo.exp?0.4:1}">
+                  <div class="cl-entry" style="opacity:{isDemoExp?0.4:1}">
                     <div class="cl-dot" style="background:{colorHex}"></div>
                     <div>
                       <div class="cl-eh"><strong>{exp.role}</strong> <em>· {exp.company}</em></div>
@@ -418,7 +416,7 @@
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Vzdělání</div>
                 {#each showEdu as edu}
-                  <div class="cl-entry" style="opacity:{isDemo.edu?0.4:1}">
+                  <div class="cl-entry" style="opacity:{isDemoEdu?0.4:1}">
                     <div class="cl-dot" style="background:{colorHex}"></div>
                     <div>
                       <div class="cl-eh"><strong>{edu.school}</strong></div>
@@ -432,7 +430,7 @@
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Dovednosti</div>
                 {#each showSkills as s}
-                  <div class="cl-skill" style="opacity:{isDemo.skills?0.4:1}">
+                  <div class="cl-skill" style="opacity:{isDemoSkills?0.4:1}">
                     <span>{s.name}</span>
                     <div class="cl-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
                   </div>
@@ -441,7 +439,7 @@
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Jazyky</div>
                 {#each showLangs as l}
-                  <div class="cl-lang" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
+                  <div class="cl-lang" style="opacity:{isDemoLangs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
                 {/each}
               </div>
               {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
@@ -483,7 +481,7 @@
               <div class="tl-sec-title" style="color:{colorHex}">Zkušenosti & Vzdělání</div>
               <div class="tl-track">
                 {#each showExp as exp}
-                  <div class="tl-item" style="opacity:{isDemo.exp?0.4:1}">
+                  <div class="tl-item" style="opacity:{isDemoExp?0.4:1}">
                     <div class="tl-dot-wrap">
                       <div class="tl-dot" style="background:{colorHex}"></div>
                       <div class="tl-line" style="background:{colorHex}22"></div>
@@ -497,7 +495,7 @@
                   </div>
                 {/each}
                 {#each showEdu as edu}
-                  <div class="tl-item" style="opacity:{isDemo.edu?0.4:1}">
+                  <div class="tl-item" style="opacity:{isDemoEdu?0.4:1}">
                     <div class="tl-dot-wrap">
                       <div class="tl-dot tl-dot-edu" style="border-color:{colorHex}"></div>
                       <div class="tl-line" style="background:{colorHex}22"></div>
@@ -515,7 +513,7 @@
               <div class="tl-bot-col">
                 <div class="tl-sec-title" style="color:{colorHex}">Dovednosti</div>
                 {#each showSkills as s}
-                  <div class="tl-skill" style="opacity:{isDemo.skills?0.4:1}">
+                  <div class="tl-skill" style="opacity:{isDemoSkills?0.4:1}">
                     <span>{s.name}</span>
                     <div class="tl-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
                   </div>
@@ -524,7 +522,7 @@
               <div class="tl-bot-col">
                 <div class="tl-sec-title" style="color:{colorHex}">Jazyky</div>
                 {#each showLangs as l}
-                  <div class="tl-lang" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
+                  <div class="tl-lang" style="opacity:{isDemoLangs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
                 {/each}
               </div>
             </div>
@@ -557,7 +555,7 @@
                 <div class="ex-sec">
                   <div class="ex-title" style="color:{colorHex}">Pracovní zkušenosti</div>
                   {#each showExp as exp}
-                    <div class="ex-entry" style="opacity:{isDemo.exp?0.4:1}">
+                    <div class="ex-entry" style="opacity:{isDemoExp?0.4:1}">
                       <div class="ex-entry-head">
                         <strong>{exp.role}</strong>
                         <span class="ex-date">{exp.from}{exp.to ? ` – ${exp.to}` : ' – současnost'}</span>
@@ -570,7 +568,7 @@
                 <div class="ex-sec">
                   <div class="ex-title" style="color:{colorHex}">Vzdělání</div>
                   {#each showEdu as edu}
-                    <div class="ex-entry" style="opacity:{isDemo.edu?0.4:1}">
+                    <div class="ex-entry" style="opacity:{isDemoEdu?0.4:1}">
                       <div class="ex-entry-head">
                         <strong>{edu.school}</strong>
                         {#if edu.from}<span class="ex-date">{edu.from}{edu.to ? ` – ${edu.to}` : ''}</span>{/if}
@@ -584,7 +582,7 @@
                 <div class="ex-sec">
                   <div class="ex-title" style="color:{colorHex}">Dovednosti</div>
                   {#each showSkills as s}
-                    <div class="ex-skill" style="opacity:{isDemo.skills?0.4:1}">
+                    <div class="ex-skill" style="opacity:{isDemoSkills?0.4:1}">
                       <span>{s.name}</span>
                       <div class="ex-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
                     </div>
@@ -593,7 +591,7 @@
                 <div class="ex-sec">
                   <div class="ex-title" style="color:{colorHex}">Jazyky</div>
                   {#each showLangs as l}
-                    <div class="ex-lang" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
+                    <div class="ex-lang" style="opacity:{isDemoLangs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
                   {/each}
                 </div>
                 {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
