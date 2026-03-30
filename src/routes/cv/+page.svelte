@@ -521,7 +521,7 @@
 
 <style>
   :global(*, *::before, *::after) { margin:0; padding:0; box-sizing:border-box; }
-  :global(html,body) { height:100%; background:#0f0f0f; font-family:'Inter',sans-serif; }
+  :global(html,body) { height:100%; background:#0f0f0f; font-family:'Inter',sans-serif; overflow-x:hidden; }
 
   .builder { display:grid; grid-template-columns:360px 1fr; height:100vh; overflow:hidden; }
 
