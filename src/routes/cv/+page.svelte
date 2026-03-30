@@ -51,6 +51,49 @@
   function exportPDF() { window.print(); }
   function hasVal(v) { return v && v.trim() !== ''; }
   const fullName = $derived((cv.firstName + ' ' + cv.lastName).trim());
+
+  // Vrátí hodnotu nebo šedý placeholder pro náhled
+  function v(val, placeholder) { return hasVal(val) ? val : placeholder; }
+  function c(val) { return hasVal(val) ? '#1a1a1a' : '#ccc'; }
+  function ca(val, accent) { return hasVal(val) ? accent : '#ccc'; }
+
+  const DEMO = {
+    name: 'Jan Novák',
+    role: 'Frontend Developer',
+    email: 'jan.novak@email.cz',
+    phone: '605 123 456',
+    location: 'Praha',
+    github: 'github.com/jannovak',
+    summary: 'Frontend developer s vášní pro čistý kód a skvělé uživatelské zážitky. Specializuji se na moderní JavaScript frameworky.',
+    experience: [
+      { role: 'Frontend Developer', company: 'Startup s.r.o.', from: '2023', to: 'současnost', desc: 'Vývoj UI v Reactu a TypeScriptu, optimalizace výkonu, spolupráce s designery.' },
+      { role: 'Junior Developer', company: 'Agentura XY', from: '2021', to: '2023', desc: 'Tvorba webových stránek — HTML, CSS, JavaScript, WordPress.' },
+    ],
+    education: [
+      { school: 'ČVUT Praha', field: 'Softwarové inženýrství', from: '2020', to: '2024', note: 'Bc.' },
+    ],
+    skills: [
+      { name: 'React / Next.js', level: 4 },
+      { name: 'TypeScript', level: 4 },
+      { name: 'CSS / Tailwind', level: 5 },
+      { name: 'Node.js', level: 3 },
+    ],
+    languages: [
+      { name: 'Čeština', level: 'Rodilý mluvčí' },
+      { name: 'Angličtina', level: 'B2' },
+    ],
+  };
+
+  const showExp   = $derived(cv.experience.length > 0 ? cv.experience : DEMO.experience);
+  const showEdu   = $derived(cv.education.length  > 0 ? cv.education  : DEMO.education);
+  const showSkills= $derived(cv.skills.filter(s=>hasVal(s.name)).length > 0 ? cv.skills.filter(s=>hasVal(s.name)) : DEMO.skills);
+  const showLangs = $derived(cv.languages.filter(l=>hasVal(l.name)).length > 0 ? cv.languages.filter(l=>hasVal(l.name)) : DEMO.languages);
+  const isDemo    = {
+    exp:    $derived(cv.experience.length === 0),
+    edu:    $derived(cv.education.length === 0),
+    skills: $derived(cv.skills.filter(s=>hasVal(s.name)).length === 0),
+    langs:  $derived(cv.languages.filter(l=>hasVal(l.name)).length === 0),
+  };
 </script>
 
 <svelte:head>
@@ -199,138 +242,80 @@
   <main class="preview">
     <div class="preview-inner">
 
-      <!-- ── MODERN ── barevný levý sidebar -->
+      <!-- ── MODERN ── -->
       {#if template === 'modern'}
         <div class="cv mod-cv">
           <div class="mod-sidebar" style="background:{colorHex}">
-            {#if hasVal(fullName)}
-              <div class="mod-name">{fullName}</div>
-            {:else}
-              <div class="sk sk-name"></div>
-              <div class="sk" style="width:55%;height:10px;margin-top:5px"></div>
-            {/if}
-            {#if hasVal(cv.role)}
-              <div class="mod-role">{cv.role}</div>
-            {:else}
-              <div class="sk sk-role"></div>
-            {/if}
-
+            <div class="mod-name" style="opacity:{hasVal(fullName)?1:.45}">{v(fullName, DEMO.name)}</div>
+            <div class="mod-role" style="opacity:{hasVal(cv.role)?1:.45}">{v(cv.role, DEMO.role)}</div>
             <div class="mod-divider"></div>
             <div class="mod-sec-title">Kontakt</div>
             <div class="mod-contacts">
-              {#if hasVal(cv.email)}<div class="mod-ci">✉ {cv.email}</div>{:else}<div class="sk sk-contact"></div>{/if}
-              {#if hasVal(cv.phone)}<div class="mod-ci">📞 {cv.phone}</div>{:else}<div class="sk sk-contact" style="width:55%"></div>{/if}
-              {#if hasVal(cv.location)}<div class="mod-ci">📍 {cv.location}</div>{:else}<div class="sk sk-contact" style="width:40%"></div>{/if}
+              <div class="mod-ci" style="opacity:{hasVal(cv.email)?1:.45}">✉ {v(cv.email, DEMO.email)}</div>
+              <div class="mod-ci" style="opacity:{hasVal(cv.phone)?1:.45}">📞 {v(cv.phone, DEMO.phone)}</div>
+              <div class="mod-ci" style="opacity:{hasVal(cv.location)?1:.45}">📍 {v(cv.location, DEMO.location)}</div>
               {#if hasVal(cv.website)}<div class="mod-ci">🌐 {cv.website}</div>{/if}
-              {#if hasVal(cv.github)}<div class="mod-ci">⌥ {cv.github}</div>{/if}
+              <div class="mod-ci" style="opacity:{hasVal(cv.github)?1:.45}">⌥ {v(cv.github, DEMO.github)}</div>
             </div>
-
             <div class="mod-divider"></div>
             <div class="mod-sec-title">Dovednosti</div>
-            {#if cv.skills.filter(s => hasVal(s.name)).length > 0}
-              {#each cv.skills as s}{#if hasVal(s.name)}
-                <div class="mod-skill">
-                  <span class="mod-skill-name">{s.name}</span>
-                  <div class="mod-skill-bar"><div class="mod-skill-fill" style="width:{s.level*20}%"></div></div>
-                </div>
-              {/if}{/each}
-            {:else}
-              {#each [70,50,85,60] as w}
-                <div class="mod-skill">
-                  <div class="sk" style="width:{w}%;height:8px;margin-bottom:5px"></div>
-                  <div class="mod-skill-bar"><div class="mod-skill-fill" style="width:{w}%"></div></div>
-                </div>
-              {/each}
-            {/if}
-
-            {#if cv.languages.filter(l => hasVal(l.name)).length > 0}
-              <div class="mod-divider"></div>
-              <div class="mod-sec-title">Jazyky</div>
-              {#each cv.languages as l}{#if hasVal(l.name)}
-                <div class="mod-lang"><span class="mod-lang-n">{l.name}</span>{#if hasVal(l.level)}<span class="mod-lang-l">{l.level}</span>{/if}</div>
-              {/if}{/each}
-            {/if}
-
-            {#if cv.certs.filter(c => hasVal(c.name)).length > 0}
+            {#each showSkills as s}
+              <div class="mod-skill" style="opacity:{isDemo.skills?0.4:1}">
+                <span class="mod-skill-name">{s.name}</span>
+                <div class="mod-skill-bar"><div class="mod-skill-fill" style="width:{s.level*20}%"></div></div>
+              </div>
+            {/each}
+            <div class="mod-divider"></div>
+            <div class="mod-sec-title">Jazyky</div>
+            {#each showLangs as l}
+              <div class="mod-lang" style="opacity:{isDemo.langs?0.4:1}">
+                <span class="mod-lang-n">{l.name}</span>
+                <span class="mod-lang-l">{l.level}</span>
+              </div>
+            {/each}
+            {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
               <div class="mod-divider"></div>
               <div class="mod-sec-title">Certifikáty</div>
-              {#each cv.certs as c}{#if hasVal(c.name)}
-                <div class="mod-cert-item"><div class="mod-cert-n">{c.name}</div>{#if hasVal(c.year)}<div class="mod-cert-s">{c.year}</div>{/if}</div>
+              {#each cv.certs as cert}{#if hasVal(cert.name)}
+                <div class="mod-cert-item"><div class="mod-cert-n">{cert.name}</div>{#if hasVal(cert.year)}<div class="mod-cert-s">{cert.year}</div>{/if}</div>
               {/if}{/each}
             {/if}
           </div>
-
           <div class="mod-main">
-            {#if hasVal(cv.summary)}
-              <div class="mod-sec">
-                <div class="mod-title" style="color:{colorHex}">O mně</div>
-                <p class="mod-text">{cv.summary}</p>
-              </div>
-            {:else}
-              <div class="mod-sec">
-                <div class="mod-title" style="color:{colorHex}">O mně</div>
-                <div class="sk-block">
-                  <div class="sk" style="width:100%;height:9px"></div>
-                  <div class="sk" style="width:92%;height:9px"></div>
-                  <div class="sk" style="width:78%;height:9px"></div>
-                </div>
-              </div>
-            {/if}
-
+            <div class="mod-sec">
+              <div class="mod-title" style="color:{colorHex}">O mně</div>
+              <p class="mod-text" style="opacity:{hasVal(cv.summary)?1:.4}">{v(cv.summary, DEMO.summary)}</p>
+            </div>
             <div class="mod-sec">
               <div class="mod-title" style="color:{colorHex}">Pracovní zkušenosti</div>
-              {#if cv.experience.length > 0}
-                {#each cv.experience as exp}
-                  <div class="mod-entry">
-                    <div class="mod-dot" style="background:{colorHex}"></div>
-                    <div class="mod-entry-body">
-                      <div class="mod-entry-row">
-                        <strong>{exp.role || 'Pozice'}</strong>
-                        {#if hasVal(exp.from)}<span class="mod-date">{exp.from}{hasVal(exp.to) ? ` – ${exp.to}` : ' – současnost'}</span>{/if}
-                      </div>
-                      {#if hasVal(exp.company)}<div class="mod-company">{exp.company}</div>{/if}
-                      {#if hasVal(exp.desc)}<p class="mod-desc">{exp.desc}</p>{/if}
+              {#each showExp as exp}
+                <div class="mod-entry" style="opacity:{isDemo.exp?0.4:1}">
+                  <div class="mod-dot" style="background:{colorHex}"></div>
+                  <div class="mod-entry-body">
+                    <div class="mod-entry-row">
+                      <strong>{exp.role}</strong>
+                      <span class="mod-date">{exp.from}{exp.to ? ` – ${exp.to}` : ' – současnost'}</span>
                     </div>
-                  </div>
-                {/each}
-              {:else}
-                {#each [[65,80,95,85],[50,70,88]] as lines}
-                  <div class="mod-entry">
-                    <div class="mod-dot" style="background:#ddd"></div>
-                    <div class="mod-entry-body sk-block">
-                      <div class="sk" style="width:{lines[0]}%;height:10px"></div>
-                      <div class="sk" style="width:{lines[1]}%;height:8px"></div>
-                      {#each lines.slice(2) as w}<div class="sk" style="width:{w}%;height:8px"></div>{/each}
-                    </div>
-                  </div>
-                {/each}
-              {/if}
-            </div>
-
-            <div class="mod-sec">
-              <div class="mod-title" style="color:{colorHex}">Vzdělání</div>
-              {#if cv.education.length > 0}
-                {#each cv.education as edu}
-                  <div class="mod-entry">
-                    <div class="mod-dot" style="background:{colorHex}"></div>
-                    <div class="mod-entry-body">
-                      <div class="mod-entry-row">
-                        <strong>{edu.school || 'Škola'}</strong>
-                        {#if hasVal(edu.from)}<span class="mod-date">{edu.from}{hasVal(edu.to) ? ` – ${edu.to}` : ''}</span>{/if}
-                      </div>
-                      {#if hasVal(edu.field)}<div class="mod-company">{edu.field}{hasVal(edu.note) ? ` · ${edu.note}` : ''}</div>{/if}
-                    </div>
-                  </div>
-                {/each}
-              {:else}
-                <div class="mod-entry">
-                  <div class="mod-dot" style="background:#ddd"></div>
-                  <div class="mod-entry-body sk-block">
-                    <div class="sk" style="width:60%;height:10px"></div>
-                    <div class="sk" style="width:45%;height:8px"></div>
+                    <div class="mod-company">{exp.company}</div>
+                    {#if exp.desc}<p class="mod-desc">{exp.desc}</p>{/if}
                   </div>
                 </div>
-              {/if}
+              {/each}
+            </div>
+            <div class="mod-sec">
+              <div class="mod-title" style="color:{colorHex}">Vzdělání</div>
+              {#each showEdu as edu}
+                <div class="mod-entry" style="opacity:{isDemo.edu?0.4:1}">
+                  <div class="mod-dot" style="background:{colorHex}"></div>
+                  <div class="mod-entry-body">
+                    <div class="mod-entry-row">
+                      <strong>{edu.school}</strong>
+                      {#if edu.from}<span class="mod-date">{edu.from}{edu.to ? ` – ${edu.to}` : ''}</span>{/if}
+                    </div>
+                    <div class="mod-company">{edu.field}{edu.note ? ` · ${edu.note}` : ''}</div>
+                  </div>
+                </div>
+              {/each}
             </div>
           </div>
         </div>
@@ -341,109 +326,55 @@
         <div class="cv">
           <div class="n-head">
             <div style="flex:1;min-width:0">
-              {#if hasVal(fullName)}
-                <div class="n-name">{fullName}</div>
-              {:else}
-                <div class="sk" style="width:65%;height:22px;border-radius:4px"></div>
-              {/if}
-              {#if hasVal(cv.role)}
-                <div class="n-role" style="color:{colorHex}">{cv.role}</div>
-              {:else}
-                <div class="sk" style="width:40%;height:11px;margin-top:8px"></div>
-              {/if}
+              <div class="n-name" style="opacity:{hasVal(fullName)?1:.4}">{v(fullName, DEMO.name)}</div>
+              <div class="n-role" style="color:{colorHex};opacity:{hasVal(cv.role)?1:.4}">{v(cv.role, DEMO.role)}</div>
             </div>
             <div class="n-contacts">
-              {#if hasVal(cv.email)}<span>{cv.email}</span>{:else}<div class="sk" style="width:130px;height:8px"></div>{/if}
-              {#if hasVal(cv.phone)}<span>{cv.phone}</span>{:else}<div class="sk" style="width:90px;height:8px"></div>{/if}
-              {#if hasVal(cv.location)}<span>{cv.location}</span>{:else}<div class="sk" style="width:60px;height:8px"></div>{/if}
+              <span style="opacity:{hasVal(cv.email)?1:.4}">{v(cv.email, DEMO.email)}</span>
+              <span style="opacity:{hasVal(cv.phone)?1:.4}">{v(cv.phone, DEMO.phone)}</span>
+              <span style="opacity:{hasVal(cv.location)?1:.4}">{v(cv.location, DEMO.location)}</span>
               {#if hasVal(cv.website)}<span>{cv.website}</span>{/if}
-              {#if hasVal(cv.github)}<span>{cv.github}</span>{/if}
+              <span style="opacity:{hasVal(cv.github)?1:.4}">{v(cv.github, DEMO.github)}</span>
             </div>
           </div>
           <div class="n-line" style="background:{colorHex}"></div>
-
-          {#if hasVal(cv.summary)}
-            <p class="n-summary">{cv.summary}</p>
-          {:else}
-            <div class="sk-block" style="margin:0 44px 20px">
-              <div class="sk" style="width:100%;height:9px"></div>
-              <div class="sk" style="width:88%;height:9px"></div>
-              <div class="sk" style="width:72%;height:9px"></div>
-            </div>
-          {/if}
-
+          <p class="n-summary" style="opacity:{hasVal(cv.summary)?1:.4}">{v(cv.summary, DEMO.summary)}</p>
           <div class="n-sec">
             <div class="n-title" style="color:{colorHex}">Pracovní zkušenosti</div>
-            {#if cv.experience.length > 0}
-              {#each cv.experience as exp}
-                <div class="n-entry">
-                  <div class="n-entry-row">
-                    <strong>{exp.role || 'Pozice'}</strong>
-                    {#if hasVal(exp.from)}<span>{exp.from}{hasVal(exp.to) ? ` – ${exp.to}` : ''}</span>{/if}
-                  </div>
-                  {#if hasVal(exp.company)}<div class="n-sub">{exp.company}</div>{/if}
-                  {#if hasVal(exp.desc)}<p class="n-desc">{exp.desc}</p>{/if}
-                </div>
-              {/each}
-            {:else}
-              {#each [[60,40,95,80],[55,38,85]] as lines}
-                <div class="n-entry sk-block">
-                  {#each lines as w, i}<div class="sk" style="width:{w}%;height:{i===0?10:8}px"></div>{/each}
-                </div>
-              {/each}
-            {/if}
+            {#each showExp as exp}
+              <div class="n-entry" style="opacity:{isDemo.exp?0.4:1}">
+                <div class="n-entry-row"><strong>{exp.role}</strong><span>{exp.from}{exp.to ? ` – ${exp.to}` : ''}</span></div>
+                <div class="n-sub">{exp.company}</div>
+                {#if exp.desc}<p class="n-desc">{exp.desc}</p>{/if}
+              </div>
+            {/each}
           </div>
-
           <div class="n-sec">
             <div class="n-title" style="color:{colorHex}">Vzdělání</div>
-            {#if cv.education.length > 0}
-              {#each cv.education as edu}
-                <div class="n-entry">
-                  <div class="n-entry-row">
-                    <strong>{edu.school || 'Škola'}</strong>
-                    {#if hasVal(edu.from)}<span>{edu.from}{hasVal(edu.to) ? ` – ${edu.to}` : ''}</span>{/if}
-                  </div>
-                  {#if hasVal(edu.field)}<div class="n-sub">{edu.field}{hasVal(edu.note) ? ` · ${edu.note}` : ''}</div>{/if}
-                </div>
-              {/each}
-            {:else}
-              <div class="n-entry sk-block">
-                <div class="sk" style="width:50%;height:10px"></div>
-                <div class="sk" style="width:35%;height:8px"></div>
+            {#each showEdu as edu}
+              <div class="n-entry" style="opacity:{isDemo.edu?0.4:1}">
+                <div class="n-entry-row"><strong>{edu.school}</strong>{#if edu.from}<span>{edu.from}{edu.to ? ` – ${edu.to}` : ''}</span>{/if}</div>
+                <div class="n-sub">{edu.field}{edu.note ? ` · ${edu.note}` : ''}</div>
               </div>
-            {/if}
+            {/each}
           </div>
-
           <div class="n-bottom">
             <div class="n-bot-col">
               <div class="n-title" style="color:{colorHex}">Dovednosti</div>
-              {#if cv.skills.filter(s=>hasVal(s.name)).length > 0}
-                <div class="n-tags">
-                  {#each cv.skills as s}{#if hasVal(s.name)}<span class="n-tag" style="border-color:{colorHex};color:{colorHex}">{s.name}</span>{/if}{/each}
-                </div>
-              {:else}
-                <div style="display:flex;flex-wrap:wrap;gap:5px">
-                  {#each [55,70,45,80,60] as w}
-                    <div class="sk" style="width:{w}px;height:20px;border-radius:2px"></div>
-                  {/each}
-                </div>
-              {/if}
+              <div class="n-tags" style="opacity:{isDemo.skills?0.4:1}">
+                {#each showSkills as s}<span class="n-tag" style="border-color:{colorHex};color:{colorHex}">{s.name}</span>{/each}
+              </div>
             </div>
             <div class="n-bot-col">
               <div class="n-title" style="color:{colorHex}">Jazyky</div>
-              {#if cv.languages.filter(l=>hasVal(l.name)).length > 0}
-                {#each cv.languages as l}{#if hasVal(l.name)}<div class="n-lang-item"><strong>{l.name}</strong>{hasVal(l.level) ? ` — ${l.level}` : ''}</div>{/if}{/each}
-              {:else}
-                <div class="sk-block">
-                  <div class="sk" style="width:80%;height:9px"></div>
-                  <div class="sk" style="width:70%;height:9px"></div>
-                </div>
-              {/if}
+              {#each showLangs as l}
+                <div class="n-lang-item" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong> — {l.level}</div>
+              {/each}
             </div>
             {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
               <div class="n-bot-col">
                 <div class="n-title" style="color:{colorHex}">Certifikáty</div>
-                {#each cv.certs as c}{#if hasVal(c.name)}<div class="n-lang-item"><strong>{c.name}</strong>{hasVal(c.year) ? ` (${c.year})` : ''}</div>{/if}{/each}
+                {#each cv.certs as cert}{#if hasVal(cert.name)}<div class="n-lang-item"><strong>{cert.name}</strong>{hasVal(cert.year) ? ` (${cert.year})` : ''}</div>{/if}{/each}
               </div>
             {/if}
           </div>
@@ -455,117 +386,69 @@
         <div class="cv">
           <div class="cl-head" style="background:{colorHex}">
             <div class="cl-head-left">
-              {#if hasVal(fullName)}
-                <div class="cl-name">{fullName}</div>
-              {:else}
-                <div class="sk sk-cl-name"></div>
-              {/if}
-              {#if hasVal(cv.role)}
-                <div class="cl-role">{cv.role}</div>
-              {:else}
-                <div class="sk sk-cl-role"></div>
-              {/if}
+              <div class="cl-name" style="opacity:{hasVal(fullName)?1:.6}">{v(fullName, DEMO.name)}</div>
+              <div class="cl-role" style="opacity:{hasVal(cv.role)?1:.6}">{v(cv.role, DEMO.role)}</div>
             </div>
             <div class="cl-contacts">
-              {#if hasVal(cv.email)}<div class="cl-c">✉ {cv.email}</div>{:else}<div class="sk sk-cl-c"></div>{/if}
-              {#if hasVal(cv.phone)}<div class="cl-c">📞 {cv.phone}</div>{:else}<div class="sk sk-cl-c" style="width:80px"></div>{/if}
-              {#if hasVal(cv.location)}<div class="cl-c">📍 {cv.location}</div>{:else}<div class="sk sk-cl-c" style="width:55px"></div>{/if}
+              <div class="cl-c" style="opacity:{hasVal(cv.email)?1:.6}">✉ {v(cv.email, DEMO.email)}</div>
+              <div class="cl-c" style="opacity:{hasVal(cv.phone)?1:.6}">📞 {v(cv.phone, DEMO.phone)}</div>
+              <div class="cl-c" style="opacity:{hasVal(cv.location)?1:.6}">📍 {v(cv.location, DEMO.location)}</div>
               {#if hasVal(cv.website)}<div class="cl-c">🌐 {cv.website}</div>{/if}
-              {#if hasVal(cv.github)}<div class="cl-c">⌥ {cv.github}</div>{/if}
             </div>
           </div>
           <div class="cl-body">
             <div class="cl-main">
-              {#if hasVal(cv.summary)}
-                <div class="cl-sec">
-                  <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Profil</div>
-                  <p class="cl-text">{cv.summary}</p>
-                </div>
-              {/if}
+              <div class="cl-sec">
+                <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Profil</div>
+                <p class="cl-text" style="opacity:{hasVal(cv.summary)?1:.4}">{v(cv.summary, DEMO.summary)}</p>
+              </div>
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Pracovní zkušenosti</div>
-                {#if cv.experience.length > 0}
-                  {#each cv.experience as exp}
-                    <div class="cl-entry">
-                      <div class="cl-dot" style="background:{colorHex}"></div>
-                      <div>
-                        <div class="cl-eh">{#if hasVal(exp.role)}<strong>{exp.role}</strong>{/if}{#if hasVal(exp.company)}<em>{hasVal(exp.role)?' · ':''}{exp.company}</em>{/if}</div>
-                        {#if hasVal(exp.from)}<div class="cl-date">{exp.from}{hasVal(exp.to)?` – ${exp.to}`:' – současnost'}</div>{/if}
-                        {#if hasVal(exp.desc)}<p class="cl-desc">{exp.desc}</p>{/if}
-                      </div>
+                {#each showExp as exp}
+                  <div class="cl-entry" style="opacity:{isDemo.exp?0.4:1}">
+                    <div class="cl-dot" style="background:{colorHex}"></div>
+                    <div>
+                      <div class="cl-eh"><strong>{exp.role}</strong> <em>· {exp.company}</em></div>
+                      <div class="cl-date">{exp.from}{exp.to ? ` – ${exp.to}` : ' – současnost'}</div>
+                      {#if exp.desc}<p class="cl-desc">{exp.desc}</p>{/if}
                     </div>
-                  {/each}
-                {:else}
-                  {#each [1,2] as _}
-                    <div class="cl-entry">
-                      <div class="cl-dot" style="background:#ddd"></div>
-                      <div class="sk-block" style="flex:1">
-                        <div class="sk" style="width:60%;height:10px"></div>
-                        <div class="sk" style="width:35%;height:8px"></div>
-                        <div class="sk" style="width:90%;height:8px"></div>
-                        <div class="sk" style="width:80%;height:8px"></div>
-                      </div>
-                    </div>
-                  {/each}
-                {/if}
+                  </div>
+                {/each}
               </div>
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Vzdělání</div>
-                {#if cv.education.length > 0}
-                  {#each cv.education as edu}
-                    <div class="cl-entry">
-                      <div class="cl-dot" style="background:{colorHex}"></div>
-                      <div>
-                        <div class="cl-eh"><strong>{edu.school||'Škola'}</strong></div>
-                        <div class="cl-date">{#if hasVal(edu.field)}{edu.field}{/if}{#if hasVal(edu.from)} · {edu.from}{hasVal(edu.to)?` – ${edu.to}`:''}{/if}</div>
-                        {#if hasVal(edu.note)}<p class="cl-desc">{edu.note}</p>{/if}
-                      </div>
-                    </div>
-                  {/each}
-                {:else}
-                  <div class="cl-entry">
-                    <div class="cl-dot" style="background:#ddd"></div>
-                    <div class="sk-block" style="flex:1">
-                      <div class="sk" style="width:50%;height:10px"></div>
-                      <div class="sk" style="width:38%;height:8px"></div>
+                {#each showEdu as edu}
+                  <div class="cl-entry" style="opacity:{isDemo.edu?0.4:1}">
+                    <div class="cl-dot" style="background:{colorHex}"></div>
+                    <div>
+                      <div class="cl-eh"><strong>{edu.school}</strong></div>
+                      <div class="cl-date">{edu.field}{edu.from ? ` · ${edu.from}` : ''}{edu.to ? ` – ${edu.to}` : ''}</div>
                     </div>
                   </div>
-                {/if}
+                {/each}
               </div>
             </div>
             <div class="cl-side">
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Dovednosti</div>
-                {#if cv.skills.filter(s=>hasVal(s.name)).length > 0}
-                  {#each cv.skills as s}{#if hasVal(s.name)}
-                    <div class="cl-skill"><span>{s.name}</span><div class="cl-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div></div>
-                  {/if}{/each}
-                {:else}
-                  {#each [75,55,90,65] as w}
-                    <div class="cl-skill">
-                      <div class="sk" style="width:{w}%;height:8px;margin-bottom:4px"></div>
-                      <div class="cl-bar"><div style="width:{w}%;background:#ddd"></div></div>
-                    </div>
-                  {/each}
-                {/if}
+                {#each showSkills as s}
+                  <div class="cl-skill" style="opacity:{isDemo.skills?0.4:1}">
+                    <span>{s.name}</span>
+                    <div class="cl-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
+                  </div>
+                {/each}
               </div>
               <div class="cl-sec">
                 <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Jazyky</div>
-                {#if cv.languages.filter(l=>hasVal(l.name)).length > 0}
-                  {#each cv.languages as l}{#if hasVal(l.name)}
-                    <div class="cl-lang"><strong>{l.name}</strong>{#if hasVal(l.level)}<span>{l.level}</span>{/if}</div>
-                  {/if}{/each}
-                {:else}
-                  {#each [1,2] as _}
-                    <div class="cl-lang"><div class="sk" style="width:70%;height:9px"></div></div>
-                  {/each}
-                {/if}
+                {#each showLangs as l}
+                  <div class="cl-lang" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
+                {/each}
               </div>
               {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
                 <div class="cl-sec">
                   <div class="cl-title" style="color:{colorHex};border-bottom:2px solid {colorHex}">Certifikáty</div>
-                  {#each cv.certs as c}{#if hasVal(c.name)}
-                    <div class="cl-cert"><strong>{c.name}</strong>{#if hasVal(c.year)}<span>{c.year}</span>{/if}</div>
+                  {#each cv.certs as cert}{#if hasVal(cert.name)}
+                    <div class="cl-cert"><strong>{cert.name}</strong>{#if hasVal(cert.year)}<span>{cert.year}</span>{/if}</div>
                   {/if}{/each}
                 </div>
               {/if}
@@ -574,268 +457,150 @@
         </div>
       {/if}
 
-      <!-- ── TIMELINE ── vertikální timeline, jednosloupec -->
+      <!-- ── TIMELINE ── -->
       {#if template === 'timeline'}
         <div class="cv">
           <div class="tl-head">
             <div class="tl-accent" style="background:{colorHex}"></div>
             <div class="tl-head-content">
-              {#if hasVal(fullName)}
-                <div class="tl-name">{fullName}</div>
-              {:else}
-                <div class="sk" style="width:55%;height:20px;border-radius:3px"></div>
-              {/if}
-              {#if hasVal(cv.role)}
-                <div class="tl-role" style="color:{colorHex}">{cv.role}</div>
-              {:else}
-                <div class="sk" style="width:35%;height:10px;margin-top:7px"></div>
-              {/if}
+              <div class="tl-name" style="opacity:{hasVal(fullName)?1:.4}">{v(fullName, DEMO.name)}</div>
+              <div class="tl-role" style="color:{colorHex};opacity:{hasVal(cv.role)?1:.4}">{v(cv.role, DEMO.role)}</div>
               <div class="tl-contacts">
-                {#if hasVal(cv.email)}<span>{cv.email}</span>{:else}<div class="sk" style="width:140px;height:8px"></div>{/if}
-                {#if hasVal(cv.phone)}<span>{cv.phone}</span>{:else}<div class="sk" style="width:95px;height:8px"></div>{/if}
-                {#if hasVal(cv.location)}<span>{cv.location}</span>{:else}<div class="sk" style="width:60px;height:8px"></div>{/if}
+                <span style="opacity:{hasVal(cv.email)?1:.4}">{v(cv.email, DEMO.email)}</span>
+                <span style="opacity:{hasVal(cv.phone)?1:.4}">{v(cv.phone, DEMO.phone)}</span>
+                <span style="opacity:{hasVal(cv.location)?1:.4}">{v(cv.location, DEMO.location)}</span>
                 {#if hasVal(cv.website)}<span>{cv.website}</span>{/if}
-                {#if hasVal(cv.github)}<span>{cv.github}</span>{/if}
+                <span style="opacity:{hasVal(cv.github)?1:.4}">{v(cv.github, DEMO.github)}</span>
               </div>
             </div>
           </div>
-
           <div class="tl-body">
-            {#if hasVal(cv.summary)}
-              <div class="tl-sec">
-                <div class="tl-sec-title" style="color:{colorHex}">O mně</div>
-                <p class="tl-text">{cv.summary}</p>
-              </div>
-            {/if}
-
-            {#if cv.experience.length > 0 || cv.education.length === 0}
-              <div class="tl-sec">
-                <div class="tl-sec-title" style="color:{colorHex}">Zkušenosti & Vzdělání</div>
-                <div class="tl-track">
-                  {#if cv.experience.length > 0}
-                    {#each cv.experience as exp}
-                      <div class="tl-item">
-                        <div class="tl-dot-wrap">
-                          <div class="tl-dot" style="background:{colorHex}"></div>
-                          <div class="tl-line" style="background:{colorHex}22"></div>
-                        </div>
-                        <div class="tl-item-body">
-                          {#if hasVal(exp.from)}<div class="tl-date">{exp.from}{hasVal(exp.to)?` – ${exp.to}`:' – současnost'}</div>{/if}
-                          <div class="tl-item-title">{exp.role||'Pozice'}</div>
-                          {#if hasVal(exp.company)}<div class="tl-item-sub">{exp.company}</div>{/if}
-                          {#if hasVal(exp.desc)}<p class="tl-desc">{exp.desc}</p>{/if}
-                        </div>
-                      </div>
-                    {/each}
-                  {:else}
-                    {#each [[65,80,90,75],[50,70,85]] as lines}
-                      <div class="tl-item">
-                        <div class="tl-dot-wrap">
-                          <div class="tl-dot" style="background:#ddd"></div>
-                          <div class="tl-line" style="background:#eee"></div>
-                        </div>
-                        <div class="tl-item-body sk-block">
-                          {#each lines as w, i}<div class="sk" style="width:{w}%;height:{i===0?10:8}px"></div>{/each}
-                        </div>
-                      </div>
-                    {/each}
-                  {/if}
-                  {#if cv.education.length > 0}
-                    {#each cv.education as edu}
-                      <div class="tl-item">
-                        <div class="tl-dot-wrap">
-                          <div class="tl-dot tl-dot-edu" style="border-color:{colorHex}"></div>
-                          <div class="tl-line" style="background:{colorHex}22"></div>
-                        </div>
-                        <div class="tl-item-body">
-                          {#if hasVal(edu.from)}<div class="tl-date">{edu.from}{hasVal(edu.to)?` – ${edu.to}`:''}</div>{/if}
-                          <div class="tl-item-title">{edu.school||'Škola'}</div>
-                          {#if hasVal(edu.field)}<div class="tl-item-sub">{edu.field}{hasVal(edu.note)?` · ${edu.note}`:''}</div>{/if}
-                        </div>
-                      </div>
-                    {/each}
-                  {/if}
-                </div>
-              </div>
-            {/if}
-
-            {#if cv.skills.filter(s=>hasVal(s.name)).length > 0 || cv.languages.filter(l=>hasVal(l.name)).length > 0}
-              <div class="tl-bottom">
-                {#if cv.skills.filter(s=>hasVal(s.name)).length > 0}
-                  <div class="tl-bot-col">
-                    <div class="tl-sec-title" style="color:{colorHex}">Dovednosti</div>
-                    {#each cv.skills as s}{#if hasVal(s.name)}
-                      <div class="tl-skill">
-                        <span>{s.name}</span>
-                        <div class="tl-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
-                      </div>
-                    {/if}{/each}
+            <div class="tl-sec">
+              <div class="tl-sec-title" style="color:{colorHex}">O mně</div>
+              <p class="tl-text" style="opacity:{hasVal(cv.summary)?1:.4}">{v(cv.summary, DEMO.summary)}</p>
+            </div>
+            <div class="tl-sec">
+              <div class="tl-sec-title" style="color:{colorHex}">Zkušenosti & Vzdělání</div>
+              <div class="tl-track">
+                {#each showExp as exp}
+                  <div class="tl-item" style="opacity:{isDemo.exp?0.4:1}">
+                    <div class="tl-dot-wrap">
+                      <div class="tl-dot" style="background:{colorHex}"></div>
+                      <div class="tl-line" style="background:{colorHex}22"></div>
+                    </div>
+                    <div class="tl-item-body">
+                      <div class="tl-date">{exp.from}{exp.to ? ` – ${exp.to}` : ' – současnost'}</div>
+                      <div class="tl-item-title">{exp.role}</div>
+                      <div class="tl-item-sub">{exp.company}</div>
+                      {#if exp.desc}<p class="tl-desc">{exp.desc}</p>{/if}
+                    </div>
                   </div>
-                {/if}
-                {#if cv.languages.filter(l=>hasVal(l.name)).length > 0}
-                  <div class="tl-bot-col">
-                    <div class="tl-sec-title" style="color:{colorHex}">Jazyky</div>
-                    {#each cv.languages as l}{#if hasVal(l.name)}
-                      <div class="tl-lang"><strong>{l.name}</strong>{#if hasVal(l.level)}<span>{l.level}</span>{/if}</div>
-                    {/if}{/each}
+                {/each}
+                {#each showEdu as edu}
+                  <div class="tl-item" style="opacity:{isDemo.edu?0.4:1}">
+                    <div class="tl-dot-wrap">
+                      <div class="tl-dot tl-dot-edu" style="border-color:{colorHex}"></div>
+                      <div class="tl-line" style="background:{colorHex}22"></div>
+                    </div>
+                    <div class="tl-item-body">
+                      {#if edu.from}<div class="tl-date">{edu.from}{edu.to ? ` – ${edu.to}` : ''}</div>{/if}
+                      <div class="tl-item-title">{edu.school}</div>
+                      <div class="tl-item-sub">{edu.field}{edu.note ? ` · ${edu.note}` : ''}</div>
+                    </div>
                   </div>
-                {/if}
+                {/each}
               </div>
-            {:else}
-              <div class="tl-bottom">
-                <div class="tl-bot-col">
-                  <div class="tl-sec-title" style="color:{colorHex}">Dovednosti</div>
-                  <div class="sk-block">
-                    {#each [70,55,85,60] as w}
-                      <div class="tl-skill">
-                        <div class="sk" style="width:{w}%;height:8px"></div>
-                        <div class="tl-bar"><div style="width:{w}%;background:#ddd"></div></div>
-                      </div>
-                    {/each}
+            </div>
+            <div class="tl-bottom">
+              <div class="tl-bot-col">
+                <div class="tl-sec-title" style="color:{colorHex}">Dovednosti</div>
+                {#each showSkills as s}
+                  <div class="tl-skill" style="opacity:{isDemo.skills?0.4:1}">
+                    <span>{s.name}</span>
+                    <div class="tl-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
                   </div>
-                </div>
-                <div class="tl-bot-col">
-                  <div class="tl-sec-title" style="color:{colorHex}">Jazyky</div>
-                  <div class="sk-block">
-                    <div class="sk" style="width:80%;height:9px"></div>
-                    <div class="sk" style="width:65%;height:9px"></div>
-                  </div>
-                </div>
+                {/each}
               </div>
-            {/if}
+              <div class="tl-bot-col">
+                <div class="tl-sec-title" style="color:{colorHex}">Jazyky</div>
+                {#each showLangs as l}
+                  <div class="tl-lang" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
+                {/each}
+              </div>
+            </div>
           </div>
         </div>
       {/if}
 
-      <!-- ── EXECUTIVE ── elegantní, centrovaná hlavička -->
+      <!-- ── EXECUTIVE ── -->
       {#if template === 'executive'}
         <div class="cv">
           <div class="ex-head">
-            {#if hasVal(fullName)}
-              <div class="ex-name">{fullName}</div>
-            {:else}
-              <div class="sk" style="width:50%;height:24px;border-radius:3px;margin:0 auto"></div>
-            {/if}
-            {#if hasVal(cv.role)}
-              <div class="ex-role" style="color:{colorHex}">{cv.role}</div>
-            {:else}
-              <div class="sk" style="width:30%;height:10px;margin:8px auto 0"></div>
-            {/if}
+            <div class="ex-name" style="opacity:{hasVal(fullName)?1:.4}">{v(fullName, DEMO.name)}</div>
+            <div class="ex-role" style="color:{colorHex};opacity:{hasVal(cv.role)?1:.4}">{v(cv.role, DEMO.role)}</div>
             <div class="ex-rule" style="background:{colorHex}"></div>
             <div class="ex-contacts">
-              {#if hasVal(cv.email)}<span>{cv.email}</span>{:else}<div class="sk" style="width:120px;height:8px"></div>{/if}
-              {#if hasVal(cv.phone)}<span class="ex-sep">·</span><span>{cv.phone}</span>{:else}<span class="ex-sep">·</span><div class="sk" style="width:80px;height:8px"></div>{/if}
-              {#if hasVal(cv.location)}<span class="ex-sep">·</span><span>{cv.location}</span>{:else}<span class="ex-sep">·</span><div class="sk" style="width:55px;height:8px"></div>{/if}
+              <span style="opacity:{hasVal(cv.email)?1:.4}">{v(cv.email, DEMO.email)}</span>
+              <span class="ex-sep">·</span><span style="opacity:{hasVal(cv.phone)?1:.4}">{v(cv.phone, DEMO.phone)}</span>
+              <span class="ex-sep">·</span><span style="opacity:{hasVal(cv.location)?1:.4}">{v(cv.location, DEMO.location)}</span>
               {#if hasVal(cv.website)}<span class="ex-sep">·</span><span>{cv.website}</span>{/if}
-              {#if hasVal(cv.github)}<span class="ex-sep">·</span><span>{cv.github}</span>{/if}
+              <span class="ex-sep">·</span><span style="opacity:{hasVal(cv.github)?1:.4}">{v(cv.github, DEMO.github)}</span>
             </div>
           </div>
-
           <div class="ex-body">
-            {#if hasVal(cv.summary)}
-              <div class="ex-sec">
-                <div class="ex-title" style="color:{colorHex}">Profil</div>
-                <p class="ex-text">{cv.summary}</p>
-              </div>
-            {:else}
-              <div class="ex-sec">
-                <div class="ex-title" style="color:{colorHex}">Profil</div>
-                <div class="sk-block">
-                  <div class="sk" style="width:100%;height:9px"></div>
-                  <div class="sk" style="width:90%;height:9px"></div>
-                  <div class="sk" style="width:75%;height:9px"></div>
-                </div>
-              </div>
-            {/if}
-
+            <div class="ex-sec">
+              <div class="ex-title" style="color:{colorHex}">Profil</div>
+              <p class="ex-text" style="opacity:{hasVal(cv.summary)?1:.4}">{v(cv.summary, DEMO.summary)}</p>
+            </div>
             <div class="ex-cols">
               <div class="ex-main">
-                {#if cv.experience.length > 0}
-                  <div class="ex-sec">
-                    <div class="ex-title" style="color:{colorHex}">Pracovní zkušenosti</div>
-                    {#each cv.experience as exp}
-                      <div class="ex-entry">
-                        <div class="ex-entry-head">
-                          <strong>{exp.role||'Pozice'}</strong>
-                          {#if hasVal(exp.from)}<span class="ex-date">{exp.from}{hasVal(exp.to)?` – ${exp.to}`:' – současnost'}</span>{/if}
-                        </div>
-                        {#if hasVal(exp.company)}<div class="ex-sub">{exp.company}</div>{/if}
-                        {#if hasVal(exp.desc)}<p class="ex-desc">{exp.desc}</p>{/if}
+                <div class="ex-sec">
+                  <div class="ex-title" style="color:{colorHex}">Pracovní zkušenosti</div>
+                  {#each showExp as exp}
+                    <div class="ex-entry" style="opacity:{isDemo.exp?0.4:1}">
+                      <div class="ex-entry-head">
+                        <strong>{exp.role}</strong>
+                        <span class="ex-date">{exp.from}{exp.to ? ` – ${exp.to}` : ' – současnost'}</span>
                       </div>
-                    {/each}
-                  </div>
-                {:else}
-                  <div class="ex-sec">
-                    <div class="ex-title" style="color:{colorHex}">Pracovní zkušenosti</div>
-                    {#each [1,2] as _}
-                      <div class="ex-entry sk-block">
-                        <div class="sk" style="width:60%;height:10px"></div>
-                        <div class="sk" style="width:40%;height:8px"></div>
-                        <div class="sk" style="width:95%;height:8px"></div>
-                        <div class="sk" style="width:80%;height:8px"></div>
-                      </div>
-                    {/each}
-                  </div>
-                {/if}
-
-                {#if cv.education.length > 0}
-                  <div class="ex-sec">
-                    <div class="ex-title" style="color:{colorHex}">Vzdělání</div>
-                    {#each cv.education as edu}
-                      <div class="ex-entry">
-                        <div class="ex-entry-head">
-                          <strong>{edu.school||'Škola'}</strong>
-                          {#if hasVal(edu.from)}<span class="ex-date">{edu.from}{hasVal(edu.to)?` – ${edu.to}`:''}</span>{/if}
-                        </div>
-                        {#if hasVal(edu.field)}<div class="ex-sub">{edu.field}{hasVal(edu.note)?` · ${edu.note}`:''}</div>{/if}
-                      </div>
-                    {/each}
-                  </div>
-                {:else}
-                  <div class="ex-sec">
-                    <div class="ex-title" style="color:{colorHex}">Vzdělání</div>
-                    <div class="ex-entry sk-block">
-                      <div class="sk" style="width:50%;height:10px"></div>
-                      <div class="sk" style="width:35%;height:8px"></div>
+                      <div class="ex-sub">{exp.company}</div>
+                      {#if exp.desc}<p class="ex-desc">{exp.desc}</p>{/if}
                     </div>
-                  </div>
-                {/if}
+                  {/each}
+                </div>
+                <div class="ex-sec">
+                  <div class="ex-title" style="color:{colorHex}">Vzdělání</div>
+                  {#each showEdu as edu}
+                    <div class="ex-entry" style="opacity:{isDemo.edu?0.4:1}">
+                      <div class="ex-entry-head">
+                        <strong>{edu.school}</strong>
+                        {#if edu.from}<span class="ex-date">{edu.from}{edu.to ? ` – ${edu.to}` : ''}</span>{/if}
+                      </div>
+                      <div class="ex-sub">{edu.field}{edu.note ? ` · ${edu.note}` : ''}</div>
+                    </div>
+                  {/each}
+                </div>
               </div>
-
               <div class="ex-side">
                 <div class="ex-sec">
                   <div class="ex-title" style="color:{colorHex}">Dovednosti</div>
-                  {#if cv.skills.filter(s=>hasVal(s.name)).length > 0}
-                    {#each cv.skills as s}{#if hasVal(s.name)}
-                      <div class="ex-skill"><span>{s.name}</span><div class="ex-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div></div>
-                    {/if}{/each}
-                  {:else}
-                    {#each [75,55,90,65] as w}
-                      <div class="ex-skill">
-                        <div class="sk" style="width:{w}%;height:8px;margin-bottom:3px"></div>
-                        <div class="ex-bar"><div style="width:{w}%;background:#ddd"></div></div>
-                      </div>
-                    {/each}
-                  {/if}
+                  {#each showSkills as s}
+                    <div class="ex-skill" style="opacity:{isDemo.skills?0.4:1}">
+                      <span>{s.name}</span>
+                      <div class="ex-bar"><div style="width:{s.level*20}%;background:{colorHex}"></div></div>
+                    </div>
+                  {/each}
                 </div>
                 <div class="ex-sec">
                   <div class="ex-title" style="color:{colorHex}">Jazyky</div>
-                  {#if cv.languages.filter(l=>hasVal(l.name)).length > 0}
-                    {#each cv.languages as l}{#if hasVal(l.name)}
-                      <div class="ex-lang"><strong>{l.name}</strong>{#if hasVal(l.level)}<span>{l.level}</span>{/if}</div>
-                    {/if}{/each}
-                  {:else}
-                    <div class="sk-block">
-                      <div class="sk" style="width:85%;height:9px"></div>
-                      <div class="sk" style="width:70%;height:9px"></div>
-                    </div>
-                  {/if}
+                  {#each showLangs as l}
+                    <div class="ex-lang" style="opacity:{isDemo.langs?0.4:1}"><strong>{l.name}</strong><span>{l.level}</span></div>
+                  {/each}
                 </div>
                 {#if cv.certs.filter(c=>hasVal(c.name)).length > 0}
                   <div class="ex-sec">
                     <div class="ex-title" style="color:{colorHex}">Certifikáty</div>
-                    {#each cv.certs as c}{#if hasVal(c.name)}
-                      <div class="ex-cert"><strong>{c.name}</strong>{#if hasVal(c.year)}<span>{c.year}</span>{/if}</div>
+                    {#each cv.certs as cert}{#if hasVal(cert.name)}
+                      <div class="ex-cert"><strong>{cert.name}</strong>{#if hasVal(cert.year)}<span>{cert.year}</span>{/if}</div>
                     {/if}{/each}
                   </div>
                 {/if}
