@@ -672,13 +672,21 @@
   /* ── RESPONSIVE ── */
   @media (max-width:900px) {
     .nav-links { display:none; }
-    .nav-inner { padding:0 24px; }
-    .hero { padding:80px 24px 60px; }
+    .nav-inner { padding:0 20px; }
+    .hero { padding:72px 20px 48px; }
     .hero-meta { display:none; }
-    .container { padding:0 24px; }
-    .proj-row { grid-template-columns:1fr; gap:40px; direction:ltr !important; }
+    .hero-h1 { letter-spacing:-2px; }
+    .hero-btns { flex-direction:column; align-items:center; gap:10px; }
+    .btn-primary, .btn-ghost { width:100%; max-width:280px; text-align:center; }
+    .container { padding:0 20px; }
+    .sec-light, .sec-dark { padding:72px 0; }
+    .h2-dark, .h2-light { margin-bottom:40px; letter-spacing:-1.5px; }
+    .sec-intro { margin-bottom:48px; }
+    .proj-row { grid-template-columns:1fr; gap:32px; direction:ltr !important; padding:48px 0; }
     .about-grid,.contact-grid,.skills-grid { grid-template-columns:1fr; gap:40px; }
     .about-cards { grid-template-columns:1fr; }
     .footer-inner { flex-direction:column; gap:12px; text-align:center; }
+    .quote-sec { padding:64px 0; }
+    .quote-text { letter-spacing:-1px; }
   }
 </style>

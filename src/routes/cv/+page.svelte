@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte';
   const TEMPLATES = [
     { id: 'modern',    label: 'Moderní' },
     { id: 'minimal',   label: 'Minimalistická' },
@@ -27,6 +28,7 @@
   let template = $state('modern');
   let colorHex = $state('#2563eb');
   let activeSection = $state('personal');
+  let mobileTab = $state('edit'); // 'edit' | 'preview'
 
   const sections = [
     { id: 'personal',   label: '👤 Osobní' },
@@ -50,6 +52,18 @@
 
   function exportPDF() { window.print(); }
   function hasVal(v) { return v && v.trim() !== ''; }
+
+  onMount(() => {
+    const setScale = () => {
+      const el = document.querySelector('.preview-inner');
+      if (!el) return;
+      if (window.innerWidth > 900) { el.style.zoom = ''; return; }
+      el.style.zoom = String(Math.min(1, window.innerWidth / 820));
+    };
+    setScale();
+    window.addEventListener('resize', setScale);
+    return () => window.removeEventListener('resize', setScale);
+  });
   const fullName = $derived((cv.firstName + ' ' + cv.lastName).trim());
 
   // Vrátí hodnotu nebo šedý placeholder pro náhled
@@ -102,7 +116,7 @@
 <div class="builder">
 
   <!-- ══ SIDEBAR ══ -->
-  <aside class="panel" id="form-panel">
+  <aside class="panel" id="form-panel" class:mob-hidden={mobileTab !== 'edit'} >
     <div class="panel-head">
       <a href="/" class="back">← Portfolio</a>
       <span class="panel-title">CV Builder</span>
@@ -237,7 +251,7 @@
   </aside>
 
   <!-- ══ PREVIEW ══ -->
-  <main class="preview">
+  <main class="preview" class:mob-hidden={mobileTab !== 'preview'} >
     <div class="preview-inner">
 
       <!-- ── MODERN ── -->
@@ -610,6 +624,19 @@
 
     </div>
   </main>
+
+  <!-- ══ MOBILE TAB BAR ══ -->
+  <div class="mob-tabbar">
+    <button class="mob-tab" class:on={mobileTab === 'edit'} onclick={() => mobileTab = 'edit'}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <span>Editovat</span>
+    </button>
+    <button class="mob-tab" class:on={mobileTab === 'preview'} onclick={() => mobileTab = 'preview'}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Náhled</span>
+    </button>
+  </div>
+
 </div>
 
 <style>
@@ -853,8 +880,45 @@
     :global(.sk-block) { display:none !important; }
   }
 
+  /* ── MOBILE TAB BAR ── */
+  .mob-tabbar { display:none; }
+
   @media (max-width:900px) {
-    .builder { grid-template-columns:1fr; height:auto; }
-    .preview { padding:16px; }
+    :global(html) { overflow:auto !important; height:auto !important; }
+    :global(body) { overflow:auto !important; height:auto !important; }
+
+    .builder {
+      grid-template-columns: 1fr;
+      height: auto;
+      min-height: 100dvh;
+      padding-bottom: 60px;
+    }
+
+    .mob-tabbar {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: #141414;
+      border-top: 1px solid rgba(255,255,255,.07);
+      z-index: 200;
+    }
+
+    .mob-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,.35); font-family: 'Inter', sans-serif; font-size: 11px;
+      font-weight: 500; letter-spacing: .3px; transition: color .2s;
+    }
+    .mob-tab.on { color: #fff; }
+    .mob-tab svg { stroke: currentColor; }
+
+    .panel { height: auto; min-height: calc(100dvh - 60px); overflow-y: auto; }
+    .preview { padding: 16px; height: auto; min-height: calc(100dvh - 60px); overflow-y: auto; align-items: flex-start; }
+    .preview-inner { width: 820px; }
+
+    .mob-hidden { display: none !important; }
+
+    .panel-head { position: sticky; top: 0; }
   }
 </style>
