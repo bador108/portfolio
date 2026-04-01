@@ -30,6 +30,11 @@
       tech: ['Next.js', 'React', 'Canvas API'], color: '#5e5ce6',
       url: 'https://clone-wars-psi.vercel.app/',
     },
+    { num: '05', title: 'CyberBot', sub: 'AI asistent pro CTF & kybernetickou bezpečnost',
+      desc: 'AI chatbot zaměřený na CTF soutěže a kybernetickou bezpečnost. Analyzuje výstupy nástrojů (nmap, gobuster), pomáhá s privilege escalation, reverse shells a CTF metodologií. Podporuje nahrávání souborů a obrázků.',
+      tech: ['React', 'FastAPI', 'Gemini AI'], color: '#7c6af7',
+      url: 'https://kyb-chatbot.vercel.app',
+    },
   ];
  
   const skills = [
