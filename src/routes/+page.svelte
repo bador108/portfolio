@@ -87,7 +87,7 @@
  
     gsap.to('.scroll-prog', {
       scaleX: 1, ease: 'none',
-      scrollTrigger: { scrub: .3, start: 'top top', end: 'bottom bottom' },
+      scrollTrigger: { trigger: document.documentElement, scrub: .3, start: 'top top', end: 'bottom bottom' },
     });
  
     gsap.to('.hero-bg-word', {
