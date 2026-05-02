@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   const TEMPLATES = [
     { id: 'modern',    label: 'Moderní' },
     { id: 'minimal',   label: 'Minimalistická' },
@@ -50,7 +50,13 @@
   function addCert()      { cv.certs      = [...cv.certs,      { name: '', issuer: '', year: '' }]; }
   function removeCert(i)  { cv.certs      = cv.certs.filter((_, j) => j !== i); }
 
-  function exportPDF() { window.print(); }
+  async function exportPDF() {
+    const prev = mobileTab;
+    mobileTab = 'preview';
+    await tick();
+    window.print();
+    mobileTab = prev;
+  }
   function hasVal(v) { return v && v.trim() !== ''; }
 
   onMount(() => {
@@ -868,6 +874,49 @@
   .ex-cert span { font-size:8pt; color:#777; }
   .ex-side { border-left:1px solid #eee; padding-left:20px; }
 
+
+  /* ── MOBILE TAB BAR ── */
+  .mob-tabbar { display:none; }
+
+  @media (max-width:900px) {
+    :global(html) { overflow:auto !important; height:auto !important; }
+    :global(body) { overflow:auto !important; height:auto !important; }
+
+    .builder {
+      grid-template-columns: 1fr;
+      height: auto;
+      min-height: 100dvh;
+      padding-bottom: 60px;
+    }
+
+    .mob-tabbar {
+      display: flex;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: #141414;
+      border-top: 1px solid rgba(255,255,255,.07);
+      z-index: 200;
+    }
+
+    .mob-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; background: none; border: none; cursor: pointer;
+      color: rgba(255,255,255,.35); font-family: 'Inter', sans-serif; font-size: 11px;
+      font-weight: 500; letter-spacing: .3px; transition: color .2s;
+    }
+    .mob-tab.on { color: #fff; }
+    .mob-tab svg { stroke: currentColor; }
+
+    .panel { height: auto; min-height: calc(100dvh - 60px); overflow-y: auto; }
+    .preview { padding: 16px; height: auto; min-height: calc(100dvh - 60px); overflow-y: auto; align-items: flex-start; }
+    .preview-inner { width: 820px; }
+
+    .mob-hidden { display: none !important; }
+
+    .panel-head { position: sticky; top: 0; }
+  }
+
   /* ── PRINT ── */
   @media print {
     /* margin:0 → no space for browser URL/title headers */
@@ -933,47 +982,5 @@
 
     :global(.sk)       { display: none !important; }
     :global(.sk-block) { display: none !important; }
-  }
-
-  /* ── MOBILE TAB BAR ── */
-  .mob-tabbar { display:none; }
-
-  @media (max-width:900px) {
-    :global(html) { overflow:auto !important; height:auto !important; }
-    :global(body) { overflow:auto !important; height:auto !important; }
-
-    .builder {
-      grid-template-columns: 1fr;
-      height: auto;
-      min-height: 100dvh;
-      padding-bottom: 60px;
-    }
-
-    .mob-tabbar {
-      display: flex;
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 60px;
-      background: #141414;
-      border-top: 1px solid rgba(255,255,255,.07);
-      z-index: 200;
-    }
-
-    .mob-tab {
-      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 4px; background: none; border: none; cursor: pointer;
-      color: rgba(255,255,255,.35); font-family: 'Inter', sans-serif; font-size: 11px;
-      font-weight: 500; letter-spacing: .3px; transition: color .2s;
-    }
-    .mob-tab.on { color: #fff; }
-    .mob-tab svg { stroke: currentColor; }
-
-    .panel { height: auto; min-height: calc(100dvh - 60px); overflow-y: auto; }
-    .preview { padding: 16px; height: auto; min-height: calc(100dvh - 60px); overflow-y: auto; align-items: flex-start; }
-    .preview-inner { width: 820px; }
-
-    .mob-hidden { display: none !important; }
-
-    .panel-head { position: sticky; top: 0; }
   }
 </style>
