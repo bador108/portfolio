@@ -1,5 +1,7 @@
 <script>
   import { onMount, tick } from 'svelte';
+  import html2canvas from 'html2canvas';
+  import jsPDF from 'jspdf';
   const TEMPLATES = [
     { id: 'modern',    label: 'Moderní' },
     { id: 'minimal',   label: 'Minimalistická' },
@@ -54,7 +56,58 @@
     const prev = mobileTab;
     mobileTab = 'preview';
     await tick();
-    window.print();
+
+    const cvEl = document.querySelector('.cv');
+    if (!cvEl) return;
+
+    const btn = document.querySelector('.pdf-btn');
+    if (btn) btn.disabled = true;
+
+    const canvas = await html2canvas(cvEl, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = (canvas.height / canvas.width) * imgW;
+
+    let y = 0;
+    if (imgH <= pageH) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgW, imgH);
+    } else {
+      // multi-page: slice canvas per page
+      const ratio = canvas.width / imgW;
+      let pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = Math.round(pageH * ratio);
+      let ctx = pageCanvas.getContext('2d');
+      let remaining = canvas.height;
+      let srcY = 0;
+      let firstPage = true;
+      while (remaining > 0) {
+        const sliceH = Math.min(pageCanvas.height, remaining);
+        ctx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        ctx.drawImage(canvas, 0, srcY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+        const sliceData = pageCanvas.toDataURL('image/jpeg', 0.95);
+        const sliceImgH = (sliceH / ratio);
+        if (!firstPage) pdf.addPage();
+        pdf.addImage(sliceData, 'JPEG', 0, 0, imgW, sliceImgH);
+        srcY += sliceH;
+        remaining -= sliceH;
+        firstPage = false;
+      }
+    }
+
+    const name = (fullName || 'cv').replace(/s+/g, '_');
+    pdf.save(name + '_cv.pdf');
+
+    if (btn) btn.disabled = false;
     mobileTab = prev;
   }
   function hasVal(v) { return v && v.trim() !== ''; }
