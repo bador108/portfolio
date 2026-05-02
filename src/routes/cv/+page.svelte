@@ -898,6 +898,12 @@
       min-height: auto !important;
     }
 
+    /* Viewport ~794px (A4 width) triggers max-width:900px media query
+       which adds display:none!important via .mob-hidden — override with higher specificity */
+    :global(.preview.mob-hidden) {
+      display: block !important;
+    }
+
     :global(.preview-inner) {
       max-width: 100% !important;
       width: 100% !important;
