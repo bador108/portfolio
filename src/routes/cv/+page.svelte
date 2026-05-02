@@ -870,14 +870,63 @@
 
   /* ── PRINT ── */
   @media print {
-    :global(html,body) { overflow:visible !important; background:white !important; }
-    :global(#form-panel) { display:none !important; }
-    :global(.builder) { display:block !important; height:auto !important; }
-    :global(.preview) { display:block !important; padding:0 !important; overflow:visible !important; background:white !important; }
-    :global(.preview-inner) { max-width:100% !important; }
-    :global(.cv) { box-shadow:none !important; min-height:auto !important; }
-    :global(.sk) { display:none !important; }
-    :global(.sk-block) { display:none !important; }
+    /* margin:0 → no space for browser URL/title headers */
+    @page { size: A4; margin: 0; }
+
+    :global(html, body) {
+      overflow: visible !important;
+      background: white !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    :global(#form-panel)  { display: none !important; }
+    :global(.mob-tabbar)  { display: none !important; }
+
+    :global(.builder) {
+      display: block !important;
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    :global(.preview) {
+      display: block !important;
+      padding: 0 !important;
+      overflow: visible !important;
+      background: white !important;
+      height: auto !important;
+      min-height: auto !important;
+    }
+
+    :global(.preview-inner) {
+      max-width: 100% !important;
+      width: 100% !important;
+      margin: 0 !important;
+      height: auto !important;
+    }
+
+    :global(.cv) {
+      box-shadow: none !important;
+      min-height: auto !important;
+      height: auto !important;
+      width: 100% !important;
+      overflow: visible !important;
+      /* Prevent spurious blank page after content */
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Force background colors to print on colored sections */
+    :global(.mod-sidebar),
+    :global(.cl-head),
+    :global(.cl-side),
+    :global(.tl-accent) {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    :global(.sk)       { display: none !important; }
+    :global(.sk-block) { display: none !important; }
   }
 
   /* ── MOBILE TAB BAR ── */
